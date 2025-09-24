@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'artikulli_baze.dart';
 
 part 'fatura.freezed.dart';
 part 'fatura.g.dart';
@@ -6,19 +7,28 @@ part 'fatura.g.dart';
 @freezed
 class Fatura with _$Fatura {
   const factory Fatura({
-    required int id,
-    @JsonKey(name: 'nr_fatures') String? invoiceNumber,
-    @JsonKey(name: 'data') DateTime? date,
-    @JsonKey(name: 'subjekti_id') int? subjectId,
-    @JsonKey(name: 'shfrytezuesi_id') int? userId,
-    @JsonKey(name: 'fatura_kategoria_id') int? categoryId,
-    @JsonKey(name: 'totali_pa_tvsh') double? totalWithoutVat,
-    @JsonKey(name: 'totali_tvsh') double? totalVat,
-    @JsonKey(name: 'totali') double? total,
-    @JsonKey(name: 'zbritja') double? discount,
-    @JsonKey(name: 'statusi') String? status,
-    @JsonKey(name: 'created_at') DateTime? createdAt,
-    @JsonKey(name: 'updated_at') DateTime? updatedAt,
+    @JsonKey(name: 'Id') required int id,
+    @JsonKey(name: 'NrFatures') String? invoiceNumber,
+    @JsonKey(name: 'Data') DateTime? date,
+    @JsonKey(name: 'SubjektiId') int? subjectId,
+    @JsonKey(name: 'ShfrytezuesiId') int? userId,
+    @JsonKey(name: 'FaturaKategoriaId') int? categoryId,
+    @JsonKey(name: 'TotaliPaTvsh') double? totalWithoutVat,
+    @JsonKey(name: 'TotaliTvsh') double? totalVat,
+    @JsonKey(name: 'Totali') double? total,
+    @JsonKey(name: 'Zbritja') double? discount,
+    @JsonKey(name: 'Statusi') String? status,
+    @JsonKey(name: 'DataEKrijimit') DateTime? createdAt,
+    @JsonKey(name: 'DataEModifikimit') DateTime? updatedAt,
+    @JsonKey(name: 'Fshire', fromJson: _boolFromInt) @Default(false) bool deleted,
+    @JsonKey(name: 'Staff', fromJson: _boolFromInt) @Default(false) bool staff,
+    @JsonKey(name: 'AfatiPageses') DateTime? paymentDue,
+    @JsonKey(name: 'Comment') String? comment,
+    @JsonKey(name: 'tenant_id') int? tenantId,
+    @JsonKey(name: 'StatusFatureId') int? statusId,
+    @JsonKey(name: 'PagesaId') int? paymentId,
+    @JsonKey(name: 'KodiValues') String? currencyCode,
+    @JsonKey(name: 'KursiKembimit', fromJson: _doubleFromString) double? exchangeRate,
     // Relations
     @JsonKey(name: 'subjekti') Subjekti? subject,
     @JsonKey(name: 'shfrytezuesi') Shfrytezuesi? user,
@@ -34,11 +44,13 @@ class Fatura with _$Fatura {
 class FaturaKategoria with _$FaturaKategoria {
   const factory FaturaKategoria({
     required int id,
-    @JsonKey(name: 'emri') String? name,
-    @JsonKey(name: 'pershkrimi') String? description,
-    @JsonKey(name: 'aktiv') bool? active,
-    @JsonKey(name: 'created_at') DateTime? createdAt,
-    @JsonKey(name: 'updated_at') DateTime? updatedAt,
+    @JsonKey(name: 'Emri') String? name,
+    @JsonKey(name: 'Kodi') String? code,
+    @JsonKey(name: 'Pershkrimi') String? description,
+    @JsonKey(name: 'TvshId') int? tvshId,
+    @JsonKey(name: 'DataEKrijimit') DateTime? createdAt,
+    @JsonKey(name: 'DataEModifikimit') DateTime? updatedAt,
+    @JsonKey(name: 'Fshire', fromJson: _boolFromInt) @Default(false) bool deleted,
   }) = _FaturaKategoria;
 
   factory FaturaKategoria.fromJson(Map<String, dynamic> json) =>
@@ -49,16 +61,25 @@ class FaturaKategoria with _$FaturaKategoria {
 class Subjekti with _$Subjekti {
   const factory Subjekti({
     required int id,
-    @JsonKey(name: 'emri') String? name,
-    @JsonKey(name: 'adresa') String? address,
-    @JsonKey(name: 'telefoni') String? phone,
-    @JsonKey(name: 'email') String? email,
-    @JsonKey(name: 'nipt') String? nipt,
-    @JsonKey(name: 'tvsh_number') String? vatNumber,
-    @JsonKey(name: 'lloji') String? type,
-    @JsonKey(name: 'aktiv') bool? active,
-    @JsonKey(name: 'created_at') DateTime? createdAt,
-    @JsonKey(name: 'updated_at') DateTime? updatedAt,
+    @JsonKey(name: 'Kodi') String? code,
+    @JsonKey(name: 'Emertimi') String? name,
+    @JsonKey(name: 'Furnitor') bool? isSupplier,
+    @JsonKey(name: 'Bleres') bool? isCustomer,
+    @JsonKey(name: 'NrUnik') String? uniqueNumber,
+    @JsonKey(name: 'NoFiskal') String? fiscalNumber,
+    @JsonKey(name: 'NoTVSH') String? vatNumber,
+    @JsonKey(name: 'NIB') String? nib,
+    @JsonKey(name: 'Adresa') String? address,
+    @JsonKey(name: 'Telefoni') String? phone,
+    @JsonKey(name: 'Email') String? email,
+    @JsonKey(name: 'Rabati') double? discount,
+    @JsonKey(name: 'Pershkrimi') String? description,
+    @JsonKey(name: 'KontojaArketueshme') int? receivableAccount,
+    @JsonKey(name: 'KontojaPagueshme') int? payableAccount,
+    @JsonKey(name: 'Limiti') double? limit,
+    @JsonKey(name: 'Fshire', fromJson: _boolFromInt) @Default(false) bool deleted,
+    @JsonKey(name: 'DataEKrijimit') DateTime? createdAt,
+    @JsonKey(name: 'DataEModifikimit') DateTime? updatedAt,
   }) = _Subjekti;
 
   factory Subjekti.fromJson(Map<String, dynamic> json) =>
@@ -69,12 +90,16 @@ class Subjekti with _$Subjekti {
 class Shfrytezuesi with _$Shfrytezuesi {
   const factory Shfrytezuesi({
     required int id,
-    @JsonKey(name: 'username') String? username,
-    @JsonKey(name: 'emri') String? name,
-    @JsonKey(name: 'email') String? email,
-    @JsonKey(name: 'aktiv') bool? active,
-    @JsonKey(name: 'created_at') DateTime? createdAt,
-    @JsonKey(name: 'updated_at') DateTime? updatedAt,
+    @JsonKey(name: 'Username') String? username,
+    @JsonKey(name: 'Email') String? email,
+    @JsonKey(name: 'Tel') String? phone,
+    @JsonKey(name: 'Aktiv') bool? active,
+    @JsonKey(name: 'Color') String? color,
+    @JsonKey(name: 'RoleId') int? roleId,
+    @JsonKey(name: 'PunetoriId') int? employeeId,
+    @JsonKey(name: 'DataEKrijimit') DateTime? createdAt,
+    @JsonKey(name: 'DataEModifikimit') DateTime? updatedAt,
+    @JsonKey(name: 'Fshire', fromJson: _boolFromInt) @Default(false) bool deleted,
   }) = _Shfrytezuesi;
 
   factory Shfrytezuesi.fromJson(Map<String, dynamic> json) =>
@@ -85,17 +110,18 @@ class Shfrytezuesi with _$Shfrytezuesi {
 class Porosia with _$Porosia {
   const factory Porosia({
     required int id,
-    @JsonKey(name: 'fatura_id') int? invoiceId,
-    @JsonKey(name: 'artikulli_baze_id') int? articleId,
-    @JsonKey(name: 'sasia') double? quantity,
-    @JsonKey(name: 'cmimi') double? price,
-    @JsonKey(name: 'zbritja') double? discount,
-    @JsonKey(name: 'tvsh_vlera') double? vatValue,
-    @JsonKey(name: 'totali_pa_tvsh') double? totalWithoutVat,
-    @JsonKey(name: 'totali_tvsh') double? totalVat,
-    @JsonKey(name: 'totali') double? total,
-    @JsonKey(name: 'created_at') DateTime? createdAt,
-    @JsonKey(name: 'updated_at') DateTime? updatedAt,
+    @JsonKey(name: 'FaturaId') int? invoiceId,
+    @JsonKey(name: 'ProduktiId') int? articleId,
+    @JsonKey(name: 'Sasia') double? quantity,
+    @JsonKey(name: 'Cmimi') double? price,
+    @JsonKey(name: 'Rabati') double? discount,
+    @JsonKey(name: 'Tvsh') double? vatValue,
+    @JsonKey(name: 'IdTavolina') String? tableId,
+    @JsonKey(name: 'Aktive') bool? active,
+    @JsonKey(name: 'ShfrytezuesiId') int? userId,
+    @JsonKey(name: 'DataEKrijimit') DateTime? createdAt,
+    @JsonKey(name: 'DataEModifikimit') DateTime? updatedAt,
+    @JsonKey(name: 'Fshire', fromJson: _boolFromInt) @Default(false) bool deleted,
     // Relations
     @JsonKey(name: 'artikulli_baze') ArtikulliBaze? article,
   }) = _Porosia;
@@ -108,15 +134,19 @@ class Porosia with _$Porosia {
 class Pagesat with _$Pagesat {
   const factory Pagesat({
     required int id,
-    @JsonKey(name: 'fatura_id') int? invoiceId,
-    @JsonKey(name: 'menyra_pageses_id') int? paymentMethodId,
-    @JsonKey(name: 'shuma') double? amount,
-    @JsonKey(name: 'kusuri') double? change,
-    @JsonKey(name: 'data') DateTime? date,
-    @JsonKey(name: 'created_at') DateTime? createdAt,
-    @JsonKey(name: 'updated_at') DateTime? updatedAt,
-    // Relations
-    @JsonKey(name: 'menyra_pageses') MenyraPageses? paymentMethod,
+    @JsonKey(name: 'DataPageses') DateTime? paymentDate,
+    @JsonKey(name: 'MenyraPagesesId') int? paymentMethodId,
+    @JsonKey(name: 'Totali') double? total,
+    @JsonKey(name: 'ShumaPaguar') double? amountPaid,
+    @JsonKey(name: 'ArkaId') int? cashRegisterId,
+    @JsonKey(name: 'BankaId') int? bankId,
+    @JsonKey(name: 'Referenca') String? reference,
+    @JsonKey(name: 'Komenti') String? comment,
+    @JsonKey(name: 'Memo') String? memo,
+    @JsonKey(name: 'KrijuarNga') String? createdBy,
+    @JsonKey(name: 'DataEModifikimit') DateTime? updatedAt,
+    @JsonKey(name: 'Valuta') String? currency,
+    @JsonKey(name: 'KursiKembimit') double? exchangeRate,
   }) = _Pagesat;
 
   factory Pagesat.fromJson(Map<String, dynamic> json) =>
@@ -127,16 +157,45 @@ class Pagesat with _$Pagesat {
 class MenyraPageses with _$MenyraPageses {
   const factory MenyraPageses({
     required int id,
-    @JsonKey(name: 'emri') String? name,
-    @JsonKey(name: 'pershkrimi') String? description,
-    @JsonKey(name: 'aktiv') bool? active,
-    @JsonKey(name: 'created_at') DateTime? createdAt,
-    @JsonKey(name: 'updated_at') DateTime? updatedAt,
+    @JsonKey(name: 'Kodi') String? code,
+    @JsonKey(name: 'Emertimi') String? name,
+    @JsonKey(name: 'Kontoja') int? account,
+    @JsonKey(name: 'FiskalType') int? fiscalType,
+    @JsonKey(name: 'PosEnabled') bool? posEnabled,
+    @JsonKey(name: 'POSBorgji') bool? posCredit,
+    @JsonKey(name: 'KontojaKalimtare') String? temporaryAccount,
+    @JsonKey(name: 'KontimneKontoKalimtare') bool? useTemporaryAccount,
+    @JsonKey(name: 'KontojaeProvizioneve') String? provisionAccount,
+    @JsonKey(name: 'BankaId') int? bankId,
+    @JsonKey(name: 'JoFiskal') bool? nonFiscal,
+    @JsonKey(name: 'DataEKrijimit') DateTime? createdAt,
+    @JsonKey(name: 'DataEModifikimit') DateTime? updatedAt,
   }) = _MenyraPageses;
 
   factory MenyraPageses.fromJson(Map<String, dynamic> json) =>
-      _$MenyraPagesestFromJson(json);
+      _$MenyraPagesesFromJson(json);
 }
 
-// Import the artikulli_baze models
-import 'artikulli_baze.dart';
+// Helper function to convert int to bool
+bool _boolFromInt(dynamic value) {
+  if (value == null) return false;
+  if (value is bool) return value;
+  if (value is int) return value != 0;
+  if (value is String) return value.toLowerCase() == 'true' || value == '1';
+  return false;
+}
+
+// Helper function to convert string to double
+double? _doubleFromString(dynamic value) {
+  if (value == null) return null;
+  if (value is double) return value;
+  if (value is int) return value.toDouble();
+  if (value is String) {
+    try {
+      return double.parse(value);
+    } catch (e) {
+      return null;
+    }
+  }
+  return null;
+}

@@ -1,0 +1,12 @@
+{
+    "name": "Kendrix Mobile App",
+    "short_name": "Kendrix",
+    "start_url": ".",
+    "display": "standalone",
+    "background_color": "#0175C2",
+    "theme_color": "#0175C2",
+    "description": "A production-grade Flutter app for Kendrix with role-based access, JWT auth, and business views.",
+    "orientation": "portrait-primary",
+    "prefer_related_applications": false,
+    "icons": []
+}

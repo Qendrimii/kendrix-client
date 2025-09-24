@@ -8,6 +8,7 @@ class LoginRequest with _$LoginRequest {
   const factory LoginRequest({
     required String email,
     required String password,
+    @JsonKey(name: 'tenant_key') String? tenantKey,
   }) = _LoginRequest;
 
   factory LoginRequest.fromJson(Map<String, dynamic> json) =>

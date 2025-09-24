@@ -150,5 +150,20 @@
   "albanian": "Shqip",
   "notifications": "Njoftimet",
   "about": "Rreth",
-  "version": "Versioni"
+  "version": "Versioni",
+  "products": "Produktet",
+  "noProducts": "Nuk ka Produkte",
+  "noProductsSubtitle": "Nuk u gjetën produkte. Shtoni disa produkte për të filluar.",
+  "addProduct": "Shto Produkt",
+  "noInvoices": "Nuk ka Fatura",
+  "noInvoicesSubtitle": "Nuk u gjetën fatura. Krijoni disa fatura për të filluar.",
+  "addInvoice": "Shto Faturë",
+  "createInvoice": "Krijo Faturë",
+  "noPurchases": "Nuk ka Blerje",
+  "noPurchasesSubtitle": "Nuk u gjetën blerje. Krijoni disa blerje për të filluar.",
+  "addPurchase": "Shto Blerje",
+  "createPurchase": "Krijo Blerje",
+  "noStock": "Nuk ka Stok",
+  "noStockSubtitle": "Nuk u gjetën artikuj stoku. Shtoni disa artikuj stoku për të filluar.",
+  "addStock": "Shto Stok"
 }

@@ -1,0 +1,325 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+
+part of 'fatura.dart';
+
+// **************************************************************************
+// JsonSerializableGenerator
+// **************************************************************************
+
+_$FaturaImpl _$$FaturaImplFromJson(Map<String, dynamic> json) => _$FaturaImpl(
+      id: (json['Id'] as num).toInt(),
+      invoiceNumber: json['NrFatures'] as String?,
+      date:
+          json['Data'] == null ? null : DateTime.parse(json['Data'] as String),
+      subjectId: (json['SubjektiId'] as num?)?.toInt(),
+      userId: (json['ShfrytezuesiId'] as num?)?.toInt(),
+      categoryId: (json['FaturaKategoriaId'] as num?)?.toInt(),
+      totalWithoutVat: (json['TotaliPaTvsh'] as num?)?.toDouble(),
+      totalVat: (json['TotaliTvsh'] as num?)?.toDouble(),
+      total: (json['Totali'] as num?)?.toDouble(),
+      discount: (json['Zbritja'] as num?)?.toDouble(),
+      status: json['Statusi'] as String?,
+      createdAt: json['DataEKrijimit'] == null
+          ? null
+          : DateTime.parse(json['DataEKrijimit'] as String),
+      updatedAt: json['DataEModifikimit'] == null
+          ? null
+          : DateTime.parse(json['DataEModifikimit'] as String),
+      deleted: json['Fshire'] == null ? false : _boolFromInt(json['Fshire']),
+      staff: json['Staff'] == null ? false : _boolFromInt(json['Staff']),
+      paymentDue: json['AfatiPageses'] == null
+          ? null
+          : DateTime.parse(json['AfatiPageses'] as String),
+      comment: json['Comment'] as String?,
+      tenantId: (json['tenant_id'] as num?)?.toInt(),
+      statusId: (json['StatusFatureId'] as num?)?.toInt(),
+      paymentId: (json['PagesaId'] as num?)?.toInt(),
+      currencyCode: json['KodiValues'] as String?,
+      exchangeRate: _doubleFromString(json['KursiKembimit']),
+      subject: json['subjekti'] == null
+          ? null
+          : Subjekti.fromJson(json['subjekti'] as Map<String, dynamic>),
+      user: json['shfrytezuesi'] == null
+          ? null
+          : Shfrytezuesi.fromJson(json['shfrytezuesi'] as Map<String, dynamic>),
+      category: json['fatura_kategoria'] == null
+          ? null
+          : FaturaKategoria.fromJson(
+              json['fatura_kategoria'] as Map<String, dynamic>),
+      orders: (json['porosi'] as List<dynamic>?)
+          ?.map((e) => Porosia.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      payments: (json['pagesat'] as List<dynamic>?)
+          ?.map((e) => Pagesat.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+
+Map<String, dynamic> _$$FaturaImplToJson(_$FaturaImpl instance) =>
+    <String, dynamic>{
+      'Id': instance.id,
+      'NrFatures': instance.invoiceNumber,
+      'Data': instance.date?.toIso8601String(),
+      'SubjektiId': instance.subjectId,
+      'ShfrytezuesiId': instance.userId,
+      'FaturaKategoriaId': instance.categoryId,
+      'TotaliPaTvsh': instance.totalWithoutVat,
+      'TotaliTvsh': instance.totalVat,
+      'Totali': instance.total,
+      'Zbritja': instance.discount,
+      'Statusi': instance.status,
+      'DataEKrijimit': instance.createdAt?.toIso8601String(),
+      'DataEModifikimit': instance.updatedAt?.toIso8601String(),
+      'Fshire': instance.deleted,
+      'Staff': instance.staff,
+      'AfatiPageses': instance.paymentDue?.toIso8601String(),
+      'Comment': instance.comment,
+      'tenant_id': instance.tenantId,
+      'StatusFatureId': instance.statusId,
+      'PagesaId': instance.paymentId,
+      'KodiValues': instance.currencyCode,
+      'KursiKembimit': instance.exchangeRate,
+      'subjekti': instance.subject,
+      'shfrytezuesi': instance.user,
+      'fatura_kategoria': instance.category,
+      'porosi': instance.orders,
+      'pagesat': instance.payments,
+    };
+
+_$FaturaKategoriaImpl _$$FaturaKategoriaImplFromJson(
+        Map<String, dynamic> json) =>
+    _$FaturaKategoriaImpl(
+      id: (json['id'] as num).toInt(),
+      name: json['Emri'] as String?,
+      code: json['Kodi'] as String?,
+      description: json['Pershkrimi'] as String?,
+      tvshId: (json['TvshId'] as num?)?.toInt(),
+      createdAt: json['DataEKrijimit'] == null
+          ? null
+          : DateTime.parse(json['DataEKrijimit'] as String),
+      updatedAt: json['DataEModifikimit'] == null
+          ? null
+          : DateTime.parse(json['DataEModifikimit'] as String),
+      deleted: json['Fshire'] == null ? false : _boolFromInt(json['Fshire']),
+    );
+
+Map<String, dynamic> _$$FaturaKategoriaImplToJson(
+        _$FaturaKategoriaImpl instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'Emri': instance.name,
+      'Kodi': instance.code,
+      'Pershkrimi': instance.description,
+      'TvshId': instance.tvshId,
+      'DataEKrijimit': instance.createdAt?.toIso8601String(),
+      'DataEModifikimit': instance.updatedAt?.toIso8601String(),
+      'Fshire': instance.deleted,
+    };
+
+_$SubjektiImpl _$$SubjektiImplFromJson(Map<String, dynamic> json) =>
+    _$SubjektiImpl(
+      id: (json['id'] as num).toInt(),
+      code: json['Kodi'] as String?,
+      name: json['Emertimi'] as String?,
+      isSupplier: json['Furnitor'] as bool?,
+      isCustomer: json['Bleres'] as bool?,
+      uniqueNumber: json['NrUnik'] as String?,
+      fiscalNumber: json['NoFiskal'] as String?,
+      vatNumber: json['NoTVSH'] as String?,
+      nib: json['NIB'] as String?,
+      address: json['Adresa'] as String?,
+      phone: json['Telefoni'] as String?,
+      email: json['Email'] as String?,
+      discount: (json['Rabati'] as num?)?.toDouble(),
+      description: json['Pershkrimi'] as String?,
+      receivableAccount: (json['KontojaArketueshme'] as num?)?.toInt(),
+      payableAccount: (json['KontojaPagueshme'] as num?)?.toInt(),
+      limit: (json['Limiti'] as num?)?.toDouble(),
+      deleted: json['Fshire'] == null ? false : _boolFromInt(json['Fshire']),
+      createdAt: json['DataEKrijimit'] == null
+          ? null
+          : DateTime.parse(json['DataEKrijimit'] as String),
+      updatedAt: json['DataEModifikimit'] == null
+          ? null
+          : DateTime.parse(json['DataEModifikimit'] as String),
+    );
+
+Map<String, dynamic> _$$SubjektiImplToJson(_$SubjektiImpl instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'Kodi': instance.code,
+      'Emertimi': instance.name,
+      'Furnitor': instance.isSupplier,
+      'Bleres': instance.isCustomer,
+      'NrUnik': instance.uniqueNumber,
+      'NoFiskal': instance.fiscalNumber,
+      'NoTVSH': instance.vatNumber,
+      'NIB': instance.nib,
+      'Adresa': instance.address,
+      'Telefoni': instance.phone,
+      'Email': instance.email,
+      'Rabati': instance.discount,
+      'Pershkrimi': instance.description,
+      'KontojaArketueshme': instance.receivableAccount,
+      'KontojaPagueshme': instance.payableAccount,
+      'Limiti': instance.limit,
+      'Fshire': instance.deleted,
+      'DataEKrijimit': instance.createdAt?.toIso8601String(),
+      'DataEModifikimit': instance.updatedAt?.toIso8601String(),
+    };
+
+_$ShfrytezuesiImpl _$$ShfrytezuesiImplFromJson(Map<String, dynamic> json) =>
+    _$ShfrytezuesiImpl(
+      id: (json['id'] as num).toInt(),
+      username: json['Username'] as String?,
+      email: json['Email'] as String?,
+      phone: json['Tel'] as String?,
+      active: json['Aktiv'] as bool?,
+      color: json['Color'] as String?,
+      roleId: (json['RoleId'] as num?)?.toInt(),
+      employeeId: (json['PunetoriId'] as num?)?.toInt(),
+      createdAt: json['DataEKrijimit'] == null
+          ? null
+          : DateTime.parse(json['DataEKrijimit'] as String),
+      updatedAt: json['DataEModifikimit'] == null
+          ? null
+          : DateTime.parse(json['DataEModifikimit'] as String),
+      deleted: json['Fshire'] == null ? false : _boolFromInt(json['Fshire']),
+    );
+
+Map<String, dynamic> _$$ShfrytezuesiImplToJson(_$ShfrytezuesiImpl instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'Username': instance.username,
+      'Email': instance.email,
+      'Tel': instance.phone,
+      'Aktiv': instance.active,
+      'Color': instance.color,
+      'RoleId': instance.roleId,
+      'PunetoriId': instance.employeeId,
+      'DataEKrijimit': instance.createdAt?.toIso8601String(),
+      'DataEModifikimit': instance.updatedAt?.toIso8601String(),
+      'Fshire': instance.deleted,
+    };
+
+_$PorosiaImpl _$$PorosiaImplFromJson(Map<String, dynamic> json) =>
+    _$PorosiaImpl(
+      id: (json['id'] as num).toInt(),
+      invoiceId: (json['FaturaId'] as num?)?.toInt(),
+      articleId: (json['ProduktiId'] as num?)?.toInt(),
+      quantity: (json['Sasia'] as num?)?.toDouble(),
+      price: (json['Cmimi'] as num?)?.toDouble(),
+      discount: (json['Rabati'] as num?)?.toDouble(),
+      vatValue: (json['Tvsh'] as num?)?.toDouble(),
+      tableId: json['IdTavolina'] as String?,
+      active: json['Aktive'] as bool?,
+      userId: (json['ShfrytezuesiId'] as num?)?.toInt(),
+      createdAt: json['DataEKrijimit'] == null
+          ? null
+          : DateTime.parse(json['DataEKrijimit'] as String),
+      updatedAt: json['DataEModifikimit'] == null
+          ? null
+          : DateTime.parse(json['DataEModifikimit'] as String),
+      deleted: json['Fshire'] == null ? false : _boolFromInt(json['Fshire']),
+      article: json['artikulli_baze'] == null
+          ? null
+          : ArtikulliBaze.fromJson(
+              json['artikulli_baze'] as Map<String, dynamic>),
+    );
+
+Map<String, dynamic> _$$PorosiaImplToJson(_$PorosiaImpl instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'FaturaId': instance.invoiceId,
+      'ProduktiId': instance.articleId,
+      'Sasia': instance.quantity,
+      'Cmimi': instance.price,
+      'Rabati': instance.discount,
+      'Tvsh': instance.vatValue,
+      'IdTavolina': instance.tableId,
+      'Aktive': instance.active,
+      'ShfrytezuesiId': instance.userId,
+      'DataEKrijimit': instance.createdAt?.toIso8601String(),
+      'DataEModifikimit': instance.updatedAt?.toIso8601String(),
+      'Fshire': instance.deleted,
+      'artikulli_baze': instance.article,
+    };
+
+_$PagesatImpl _$$PagesatImplFromJson(Map<String, dynamic> json) =>
+    _$PagesatImpl(
+      id: (json['id'] as num).toInt(),
+      paymentDate: json['DataPageses'] == null
+          ? null
+          : DateTime.parse(json['DataPageses'] as String),
+      paymentMethodId: (json['MenyraPagesesId'] as num?)?.toInt(),
+      total: (json['Totali'] as num?)?.toDouble(),
+      amountPaid: (json['ShumaPaguar'] as num?)?.toDouble(),
+      cashRegisterId: (json['ArkaId'] as num?)?.toInt(),
+      bankId: (json['BankaId'] as num?)?.toInt(),
+      reference: json['Referenca'] as String?,
+      comment: json['Komenti'] as String?,
+      memo: json['Memo'] as String?,
+      createdBy: json['KrijuarNga'] as String?,
+      updatedAt: json['DataEModifikimit'] == null
+          ? null
+          : DateTime.parse(json['DataEModifikimit'] as String),
+      currency: json['Valuta'] as String?,
+      exchangeRate: (json['KursiKembimit'] as num?)?.toDouble(),
+    );
+
+Map<String, dynamic> _$$PagesatImplToJson(_$PagesatImpl instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'DataPageses': instance.paymentDate?.toIso8601String(),
+      'MenyraPagesesId': instance.paymentMethodId,
+      'Totali': instance.total,
+      'ShumaPaguar': instance.amountPaid,
+      'ArkaId': instance.cashRegisterId,
+      'BankaId': instance.bankId,
+      'Referenca': instance.reference,
+      'Komenti': instance.comment,
+      'Memo': instance.memo,
+      'KrijuarNga': instance.createdBy,
+      'DataEModifikimit': instance.updatedAt?.toIso8601String(),
+      'Valuta': instance.currency,
+      'KursiKembimit': instance.exchangeRate,
+    };
+
+_$MenyraPagesesImpl _$$MenyraPagesesImplFromJson(Map<String, dynamic> json) =>
+    _$MenyraPagesesImpl(
+      id: (json['id'] as num).toInt(),
+      code: json['Kodi'] as String?,
+      name: json['Emertimi'] as String?,
+      account: (json['Kontoja'] as num?)?.toInt(),
+      fiscalType: (json['FiskalType'] as num?)?.toInt(),
+      posEnabled: json['PosEnabled'] as bool?,
+      posCredit: json['POSBorgji'] as bool?,
+      temporaryAccount: json['KontojaKalimtare'] as String?,
+      useTemporaryAccount: json['KontimneKontoKalimtare'] as bool?,
+      provisionAccount: json['KontojaeProvizioneve'] as String?,
+      bankId: (json['BankaId'] as num?)?.toInt(),
+      nonFiscal: json['JoFiskal'] as bool?,
+      createdAt: json['DataEKrijimit'] == null
+          ? null
+          : DateTime.parse(json['DataEKrijimit'] as String),
+      updatedAt: json['DataEModifikimit'] == null
+          ? null
+          : DateTime.parse(json['DataEModifikimit'] as String),
+    );
+
+Map<String, dynamic> _$$MenyraPagesesImplToJson(_$MenyraPagesesImpl instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'Kodi': instance.code,
+      'Emertimi': instance.name,
+      'Kontoja': instance.account,
+      'FiskalType': instance.fiscalType,
+      'PosEnabled': instance.posEnabled,
+      'POSBorgji': instance.posCredit,
+      'KontojaKalimtare': instance.temporaryAccount,
+      'KontimneKontoKalimtare': instance.useTemporaryAccount,
+      'KontojaeProvizioneve': instance.provisionAccount,
+      'BankaId': instance.bankId,
+      'JoFiskal': instance.nonFiscal,
+      'DataEKrijimit': instance.createdAt?.toIso8601String(),
+      'DataEModifikimit': instance.updatedAt?.toIso8601String(),
+    };

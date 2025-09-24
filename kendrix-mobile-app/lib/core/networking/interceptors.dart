@@ -1,5 +1,4 @@
 import 'dart:developer' as developer;
-import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -7,6 +6,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../../config/env.dart';
 import '../auth/auth_repository.dart';
 import '../auth/token_storage.dart';
+import 'dio_client.dart';
 
 class AuthInterceptor extends Interceptor {
   final Ref _ref;
@@ -153,7 +153,10 @@ class RetryInterceptor extends Interceptor {
       
       try {
         final dio = Dio();
-        dio.options = requestOptions.baseOptions;
+        dio.options.baseUrl = requestOptions.baseUrl;
+        dio.options.connectTimeout = requestOptions.connectTimeout;
+        dio.options.receiveTimeout = requestOptions.receiveTimeout;
+        dio.options.headers = requestOptions.headers;
         final response = await dio.fetch(requestOptions);
         handler.resolve(response);
         return;

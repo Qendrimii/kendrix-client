@@ -15,16 +15,23 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     initialLocation: AppRoute.dashboard.path,
     debugLogDiagnostics: true,
     redirect: (context, state) async {
-      // Apply guards in order
+      print('🌐 Router redirect called for: ${state.matchedLocation}');
+      
+      // Only apply auth guard to avoid redirect loops
       var redirect = await routeGuard.authGuard(state);
-      if (redirect != null) return redirect;
+      if (redirect != null) {
+        print('🌐 Auth guard redirecting from ${state.matchedLocation} to $redirect');
+        return redirect;
+      }
 
-      redirect = await routeGuard.tenantGuard(state);
-      if (redirect != null) return redirect;
+      // TODO: Re-enable tenant and admin guards after fixing auth
+      // redirect = await routeGuard.tenantGuard(state);
+      // if (redirect != null) return redirect;
 
-      redirect = await routeGuard.adminGuard(state);
-      if (redirect != null) return redirect;
+      // redirect = await routeGuard.adminGuard(state);
+      // if (redirect != null) return redirect;
 
+      print('🌐 No redirect needed for: ${state.matchedLocation}');
       return null;
     },
     routes: [

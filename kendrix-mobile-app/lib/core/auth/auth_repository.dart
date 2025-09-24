@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import '../../config/env.dart';
 import '../../features/auth/models/login_request.dart';
 import '../../features/auth/models/login_response.dart';
 import '../../features/auth/models/user.dart';
@@ -9,15 +10,15 @@ import 'jwt_decoder.dart';
 import 'token_storage.dart';
 
 class AuthRepository {
-  final ApiClient _apiClient;
+  final Dio _dio;
   final TokenStorage _tokenStorage;
 
-  AuthRepository(this._apiClient, this._tokenStorage);
+  AuthRepository(this._dio, this._tokenStorage);
 
   Future<LoginResponse> login(LoginRequest request) async {
     try {
-      final response = await _apiClient.post<Map<String, dynamic>>(
-        '/auth/login',
+      final response = await _dio.post<Map<String, dynamic>>(
+        '${Env.mobileApiPath}/auth/login',
         data: request.toJson(),
       );
 
@@ -27,11 +28,20 @@ class AuthRepository {
 
       final loginResponse = LoginResponse.fromJson(response.data!);
       
+      print('🔐 Login successful! Token: ${loginResponse.token.substring(0, 20)}...');
+      
       // Save tokens
       await _tokenStorage.saveTokens(
-        accessToken: loginResponse.accessToken,
-        refreshToken: loginResponse.refreshToken,
+        accessToken: loginResponse.token,
+        refreshToken: loginResponse.token, // For simplicity, using same token
       );
+      
+      // Verify tokens were saved
+      final savedToken = await _tokenStorage.getAccessToken();
+      print('🔐 Token saved successfully: ${savedToken != null}');
+      if (savedToken != null) {
+        print('🔐 Saved token starts with: ${savedToken.substring(0, 20)}...');
+      }
 
       return loginResponse;
     } on DioException catch (e) {
@@ -49,27 +59,30 @@ class AuthRepository {
 
   Future<bool> refreshToken() async {
     try {
-      final refreshToken = await _tokenStorage.getRefreshToken();
-      if (refreshToken == null) {
+      final accessToken = await _tokenStorage.getAccessToken();
+      if (accessToken == null) {
         return false;
       }
 
-      final response = await _apiClient.post<Map<String, dynamic>>(
-        '/auth/refresh',
-        data: {'refresh_token': refreshToken},
+      final response = await _dio.post<Map<String, dynamic>>(
+        '${Env.mobileApiPath}/auth/refresh',
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $accessToken',
+          },
+        ),
       );
 
       if (response.data == null) {
         return false;
       }
 
-      final accessToken = response.data!['access_token'] as String?;
-      final newRefreshToken = response.data!['refresh_token'] as String?;
+      final newToken = response.data!['token'] as String?;
 
-      if (accessToken != null && newRefreshToken != null) {
+      if (newToken != null) {
         await _tokenStorage.saveTokens(
-          accessToken: accessToken,
-          refreshToken: newRefreshToken,
+          accessToken: newToken,
+          refreshToken: newToken, // For simplicity, using same token
         );
         return true;
       }
@@ -82,13 +95,15 @@ class AuthRepository {
 
   Future<User> getCurrentUser() async {
     try {
-      final response = await _apiClient.get<Map<String, dynamic>>('/me');
+      final response = await _dio.get<Map<String, dynamic>>(
+        '${Env.mobileApiPath}/auth/profile',
+      );
 
       if (response.data == null) {
         throw Exception('Invalid response from server');
       }
 
-      return User.fromJson(response.data!);
+      return User.fromJson(response.data!['user']);
     } on DioException catch (e) {
       if (e.response?.statusCode == 401) {
         throw Exception('Unauthorized');
@@ -103,7 +118,7 @@ class AuthRepository {
   Future<void> logout() async {
     try {
       // Try to call logout endpoint
-      await _apiClient.post('/auth/logout');
+      await _dio.post('${Env.mobileApiPath}/auth/logout');
     } catch (e) {
       // Ignore errors on logout endpoint
     } finally {
@@ -113,18 +128,28 @@ class AuthRepository {
   }
 
   Future<bool> isAuthenticated() async {
+    print('🔐 Checking authentication status...');
     final accessToken = await _tokenStorage.getAccessToken();
+    print('🔐 Access token exists: ${accessToken != null}');
+    
     if (accessToken == null) {
+      print('🔐 No access token found');
       return false;
     }
 
     // Check if token is expired
-    if (JwtDecoder.isExpired(accessToken)) {
+    final isExpired = JwtDecoder.isExpired(accessToken);
+    print('🔐 Token expired: $isExpired');
+    
+    if (isExpired) {
+      print('🔐 Token expired, attempting refresh...');
       // Try to refresh
       final refreshed = await refreshToken();
+      print('🔐 Token refresh result: $refreshed');
       return refreshed;
     }
 
+    print('🔐 Authentication check passed');
     return true;
   }
 
@@ -165,9 +190,9 @@ class AuthRepository {
 }
 
 final authRepositoryProvider = Provider<AuthRepository>((ref) {
-  final apiClient = ref.watch(apiClientProvider);
+  final dio = ref.watch(dioClientProvider);
   final tokenStorage = ref.watch(tokenStorageProvider);
-  return AuthRepository(apiClient, tokenStorage);
+  return AuthRepository(dio, tokenStorage);
 });
 
 // Auth state provider

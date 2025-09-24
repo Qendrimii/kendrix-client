@@ -1,4 +1,5 @@
 import 'package:intl/intl.dart';
+import 'dart:math';
 
 class MoneyFormatter {
   static const String defaultCurrency = 'EUR';
@@ -144,5 +145,3 @@ extension MoneyExtension on double {
     );
   }
 }
-
-import 'dart:math';

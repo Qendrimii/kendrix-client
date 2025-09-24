@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-
+import 'package:go_router/go_router.dart';
 import '../../../core/auth/auth_repository.dart';
 import '../../../core/i18n/l10n.dart';
 import '../../../core/routing/route_guards.dart';
@@ -93,5 +93,3 @@ class TenantSelectorScreen extends ConsumerWidget {
     );
   }
 }
-
-import 'package:go_router/go_router.dart';

@@ -1,0 +1,168 @@
+// **************************************************************************
+// JsonSerializableGenerator
+// **************************************************************************
+
+_$ArtikulliBazeImpl _$$ArtikulliBazeImplFromJson(Map<String, dynamic> json) =>
+    _$ArtikulliBazeImpl(
+      id: (json['id'] as num).toInt(),
+      isArticle: json['Artikull'] as bool?,
+      isService: json['Sherbim'] as bool?,
+      code: json['Shifra'] as String?,
+      name: json['Emri'] as String?,
+      unit: json['Njesia'] as String?,
+      barcode: json['Barkodi'] as String?,
+      sellingPricePerPiece: (json['Cmimi_I_Shitjes_Cope'] as num?)?.toDouble(),
+      sellingPricePerPackage:
+          (json['Cmimi_I_Shitjes_Pako'] as num?)?.toDouble(),
+      packageQuantity: (json['SasiaPako'] as num?)?.toInt(),
+      categoryId: (json['KategoriaId'] as num?)?.toInt(),
+      active: json['Aktiv'] as bool?,
+      isComposite: json['ArtikullIPerbere'] as bool?,
+      genericName: json['EmriGjenerik'] as String?,
+      manufacturer: json['Prodhuesi'] as String?,
+      fromScale: json['ArtNgaPeshorja'] as bool?,
+      tvshId: (json['TvshId'] as num?)?.toInt(),
+      alternativeName: json['EmertimiiDyte'] as String?,
+      netWeight: (json['PeshaNeto'] as num?)?.toDouble(),
+      grossWeight: (json['PeshaBruto'] as num?)?.toDouble(),
+      length: (json['Gjatesia'] as num?)?.toDouble(),
+      width: (json['Gjersia'] as num?)?.toDouble(),
+      height: (json['Lartesia'] as num?)?.toDouble(),
+      minimumQuantity: (json['SasiaMinimale'] as num?)?.toDouble(),
+      maximumQuantity: (json['SasiaMaksimale'] as num?)?.toDouble(),
+      shortTerm: json['Afatshkurte'] as bool?,
+      longTerm: json['Afatgjate'] as bool?,
+      depreciationRate: (json['NormaZhvleresimit'] as num?)?.toDouble(),
+      depreciationStartDate: json['DataEFillimitTeZhvlersimit'] == null
+          ? null
+          : DateTime.parse(json['DataEFillimitTeZhvlersimit'] as String),
+      tempId: (json['TempId'] as num?)?.toInt(),
+      expiryDate: json['Skadimi'] == null
+          ? null
+          : DateTime.parse(json['Skadimi'] as String),
+      packaging: json['Ambalazhi'] as String?,
+      isRefundable: json['IRimbursueshem'] as bool?,
+      origin: json['OrigjinaEMallit'] as String?,
+      productionCost: (json['KostoEProdhimit'] as num?)?.toInt(),
+      shelf: json['Rafti'] as String?,
+      customsCode: json['KodiDoganor'] as String?,
+      subjectId: (json['SubjektiId'] as num?)?.toInt(),
+      incomeAccountId: (json['IncomeAccountId'] as num?)?.toInt(),
+      expenseAccountId: (json['ExpenseAccountId'] as num?)?.toInt(),
+      isGroup: json['IsGroup'] as bool?,
+      groupId: (json['GroupId'] as num?)?.toInt(),
+      createdAt: json['DataEKrijimit'] == null
+          ? null
+          : DateTime.parse(json['DataEKrijimit'] as String),
+      updatedAt: json['DataEModifikimit'] == null
+          ? null
+          : DateTime.parse(json['DataEModifikimit'] as String),
+      category: json['kategoria'] == null
+          ? null
+          : Kategoria.fromJson(json['kategoria'] as Map<String, dynamic>),
+      tvsh: json['tvsh'] == null
+          ? null
+          : TVSH.fromJson(json['tvsh'] as Map<String, dynamic>),
+    );
+
+Map<String, dynamic> _$$ArtikulliBazeImplToJson(_$ArtikulliBazeImpl instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'Artikull': instance.isArticle,
+      'Sherbim': instance.isService,
+      'Shifra': instance.code,
+      'Emri': instance.name,
+      'Njesia': instance.unit,
+      'Barkodi': instance.barcode,
+      'Cmimi_I_Shitjes_Cope': instance.sellingPricePerPiece,
+      'Cmimi_I_Shitjes_Pako': instance.sellingPricePerPackage,
+      'SasiaPako': instance.packageQuantity,
+      'KategoriaId': instance.categoryId,
+      'Aktiv': instance.active,
+      'ArtikullIPerbere': instance.isComposite,
+      'EmriGjenerik': instance.genericName,
+      'Prodhuesi': instance.manufacturer,
+      'ArtNgaPeshorja': instance.fromScale,
+      'TvshId': instance.tvshId,
+      'EmertimiiDyte': instance.alternativeName,
+      'PeshaNeto': instance.netWeight,
+      'PeshaBruto': instance.grossWeight,
+      'Gjatesia': instance.length,
+      'Gjersia': instance.width,
+      'Lartesia': instance.height,
+      'SasiaMinimale': instance.minimumQuantity,
+      'SasiaMaksimale': instance.maximumQuantity,
+      'Afatshkurte': instance.shortTerm,
+      'Afatgjate': instance.longTerm,
+      'NormaZhvleresimit': instance.depreciationRate,
+      'DataEFillimitTeZhvlersimit':
+          instance.depreciationStartDate?.toIso8601String(),
+      'TempId': instance.tempId,
+      'Skadimi': instance.expiryDate?.toIso8601String(),
+      'Ambalazhi': instance.packaging,
+      'IRimbursueshem': instance.isRefundable,
+      'OrigjinaEMallit': instance.origin,
+      'KostoEProdhimit': instance.productionCost,
+      'Rafti': instance.shelf,
+      'KodiDoganor': instance.customsCode,
+      'SubjektiId': instance.subjectId,
+      'IncomeAccountId': instance.incomeAccountId,
+      'ExpenseAccountId': instance.expenseAccountId,
+      'IsGroup': instance.isGroup,
+      'GroupId': instance.groupId,
+      'DataEKrijimit': instance.createdAt?.toIso8601String(),
+      'DataEModifikimit': instance.updatedAt?.toIso8601String(),
+      'kategoria': instance.category,
+      'tvsh': instance.tvsh,
+    };
+
+_$KategoriaImpl _$$KategoriaImplFromJson(Map<String, dynamic> json) =>
+    _$KategoriaImpl(
+      id: (json['id'] as num).toInt(),
+      name: json['Emri'] as String?,
+      color: json['Color'] as String?,
+      printer: json['Printer'] as String?,
+      type: (json['Lloji'] as num?)?.toInt(),
+      printerName: json['EmriNePrinter'] as String?,
+      createdAt: json['DataEKrijimit'] == null
+          ? null
+          : DateTime.parse(json['DataEKrijimit'] as String),
+      updatedAt: json['DataEModifikimit'] == null
+          ? null
+          : DateTime.parse(json['DataEModifikimit'] as String),
+    );
+
+Map<String, dynamic> _$$KategoriaImplToJson(_$KategoriaImpl instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'Emri': instance.name,
+      'Color': instance.color,
+      'Printer': instance.printer,
+      'Lloji': instance.type,
+      'EmriNePrinter': instance.printerName,
+      'DataEKrijimit': instance.createdAt?.toIso8601String(),
+      'DataEModifikimit': instance.updatedAt?.toIso8601String(),
+    };
+
+_$TVSHImpl _$$TVSHImplFromJson(Map<String, dynamic> json) => _$TVSHImpl(
+      id: (json['id'] as num).toInt(),
+      percentage: (json['Perqindja'] as num?)?.toDouble(),
+      group: json['Grupi'] as String?,
+      createdAt: json['DataEKrijimit'] == null
+          ? null
+          : DateTime.parse(json['DataEKrijimit'] as String),
+      updatedAt: json['DataEModifikimit'] == null
+          ? null
+          : DateTime.parse(json['DataEModifikimit'] as String),
+      deleted: json['Fshire'] as bool?,
+    );
+
+Map<String, dynamic> _$$TVSHImplToJson(_$TVSHImpl instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'Perqindja': instance.percentage,
+      'Grupi': instance.group,
+      'DataEKrijimit': instance.createdAt?.toIso8601String(),
+      'DataEModifikimit': instance.updatedAt?.toIso8601String(),
+      'Fshire': instance.deleted,
+    };

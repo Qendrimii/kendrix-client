@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-
+import 'package:go_router/go_router.dart';
+import '../core/auth/auth_repository.dart';
 import '../core/i18n/l10n.dart';
 import '../core/routing/route_guards.dart';
 import '../core/theme/theme.dart';
@@ -127,7 +128,7 @@ class AppScaffold extends ConsumerWidget {
           'U',
         ),
       ),
-      itemBuilder: (context) => [
+      itemBuilder: (context) => <PopupMenuEntry>[
         PopupMenuItem(
           child: Text(context.l10n.profile),
           onTap: () => context.go(AppRoute.profile.path),
@@ -195,7 +196,7 @@ class AppScaffold extends ConsumerWidget {
               label: Text(l10n.reports_),
             ),
           ],
-          selectedIndex: _getSelectedIndex(context),
+          selectedIndex: _getSelectedIndex(context, isAdmin),
           onDestinationSelected: (index) => _onDestinationSelected(context, index, isAdmin),
         );
       },
@@ -233,16 +234,26 @@ class AppScaffold extends ConsumerWidget {
     );
   }
 
-  int _getSelectedIndex(BuildContext context) {
+  int _getSelectedIndex(BuildContext context, bool isAdmin) {
     final location = GoRouter.of(context).routerDelegate.currentConfiguration.fullPath;
     
     if (location.startsWith('/dashboard')) return 0;
-    if (location.startsWith('/admin/tenants')) return 1;
-    if (location.startsWith('/admin/users')) return 2;
-    if (location.startsWith('/fatura')) return 3;
-    if (location.startsWith('/blerjet')) return 4;
-    if (location.startsWith('/stoku')) return 5;
-    if (location.contains('report')) return 6;
+    
+    int index = 1;
+    if (isAdmin) {
+      if (location.startsWith('/admin/tenants')) return index;
+      index++;
+      if (location.startsWith('/admin/users')) return index;
+      index++;
+    }
+    
+    if (location.startsWith('/fatura')) return index;
+    index++;
+    if (location.startsWith('/blerjet')) return index;
+    index++;
+    if (location.startsWith('/stoku')) return index;
+    index++;
+    if (location.contains('report')) return index;
     
     return 0;
   }
@@ -259,36 +270,55 @@ class AppScaffold extends ConsumerWidget {
   }
 
   void _onDestinationSelected(BuildContext context, int index, bool isAdmin) {
-    switch (index) {
-      case 0:
-        context.go(AppRoute.dashboard.path);
-        break;
-      case 1:
-        if (isAdmin) {
-          context.go(AppRoute.adminTenants.path);
-        } else {
-          context.go(AppRoute.fatura.path);
-        }
-        break;
-      case 2:
-        if (isAdmin) {
-          context.go(AppRoute.adminUsers.path);
-        } else {
-          context.go(AppRoute.blerjet.path);
-        }
-        break;
-      case 3:
-        context.go(isAdmin ? AppRoute.fatura.path : AppRoute.stoku.path);
-        break;
-      case 4:
-        context.go(AppRoute.blerjet.path);
-        break;
-      case 5:
-        context.go(AppRoute.stoku.path);
-        break;
-      case 6:
-        context.go(AppRoute.zRaportet.path);
-        break;
+    int currentIndex = 0;
+    
+    // Dashboard
+    if (index == currentIndex) {
+      context.go(AppRoute.dashboard.path);
+      return;
+    }
+    currentIndex++;
+    
+    // Admin routes (only if admin)
+    if (isAdmin) {
+      if (index == currentIndex) {
+        context.go(AppRoute.adminTenants.path);
+        return;
+      }
+      currentIndex++;
+      
+      if (index == currentIndex) {
+        context.go(AppRoute.adminUsers.path);
+        return;
+      }
+      currentIndex++;
+    }
+    
+    // Fatura
+    if (index == currentIndex) {
+      context.go(AppRoute.fatura.path);
+      return;
+    }
+    currentIndex++;
+    
+    // Blerjet
+    if (index == currentIndex) {
+      context.go(AppRoute.blerjet.path);
+      return;
+    }
+    currentIndex++;
+    
+    // Stoku
+    if (index == currentIndex) {
+      context.go(AppRoute.stoku.path);
+      return;
+    }
+    currentIndex++;
+    
+    // Reports
+    if (index == currentIndex) {
+      context.go(AppRoute.zRaportet.path);
+      return;
     }
   }
 
@@ -309,6 +339,3 @@ class AppScaffold extends ConsumerWidget {
     }
   }
 }
-
-import 'package:go_router/go_router.dart';
-import '../core/auth/auth_repository.dart';

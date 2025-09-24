@@ -2,7 +2,6 @@ import 'package:dio/dio.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../config/env.dart';
-import '../auth/token_storage.dart';
 import 'interceptors.dart';
 
 final dioClientProvider = Provider<Dio>((ref) {

@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -60,17 +59,29 @@ class RouteGuard {
   RouteGuard(this._ref);
 
   Future<String?> authGuard(GoRouterState state) async {
-    final authState = _ref.read(authStateProvider);
+    print('🔐 Auth guard checking route: ${state.matchedLocation}');
     
-    if (!authState.isAuthenticated) {
-      return AppRoute.login.path;
+    // Check auth state from provider instead of repository to avoid race conditions
+    final authState = _ref.read(authStateProvider);
+    final isAuth = authState.isAuthenticated;
+    
+    print('🔐 Authentication status: $isAuth for route: ${state.matchedLocation}');
+    
+    if (!isAuth) {
+      // If not authenticated and not already on login page, redirect to login
+      if (state.matchedLocation != AppRoute.login.path) {
+        print('🔐 Not authenticated, redirecting to login from: ${state.matchedLocation}');
+        return AppRoute.login.path;
+      }
+    } else {
+      // If authenticated but on login page, redirect to dashboard
+      if (state.matchedLocation == AppRoute.login.path) {
+        print('🔐 Already authenticated on login page, redirecting to dashboard');
+        return AppRoute.dashboard.path;
+      }
     }
 
-    // If user is authenticated but accessing login, redirect to dashboard
-    if (state.matchedLocation == AppRoute.login.path) {
-      return AppRoute.dashboard.path;
-    }
-
+    print('🔐 Auth guard passed for route: ${state.matchedLocation}');
     return null;
   }
 

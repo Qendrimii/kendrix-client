@@ -1,7 +1,7 @@
 class Env {
   static const String apiBaseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'http://localhost/kendrix-sync-api',
+    defaultValue: 'https://client.kendrix.org',
   );
 
   static const String appEnv = String.fromEnvironment(
@@ -17,6 +17,15 @@ class Env {
   static const bool isProduction = appEnv == 'production';
   static const bool isDevelopment = appEnv == 'development';
   static const bool isStaging = appEnv == 'staging';
+
+  // API Paths
+  static const String mobileApiPath = '/api/mobile/v1';
+  static const String syncApiPath = '/api/sync/v1';
+
+  // Demo credentials for testing
+  static const String demoTenantKey = 'demo-company-2025';
+  static const String demoEmail = 'admin@kendrix.demo';
+  static const String demoPassword = 'admin123';
 
   // JWT
   static const Duration tokenRefreshThreshold = Duration(minutes: 5);

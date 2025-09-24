@@ -23,9 +23,9 @@ class User with _$User {
 @freezed
 class Tenant with _$Tenant {
   const factory Tenant({
-    required int id,
-    required String name,
-    @JsonKey(name: 'external_key') String? externalKey,
+    @JsonKey(name: 'Id') required int id,
+    @JsonKey(name: 'Name') required String name,
+    @JsonKey(name: 'ExternalKey') String? externalKey,
     String? status,
     @JsonKey(name: 'created_at') DateTime? createdAt,
     @JsonKey(name: 'updated_at') DateTime? updatedAt,

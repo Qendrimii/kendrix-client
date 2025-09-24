@@ -150,5 +150,20 @@
   "albanian": "Albanian",
   "notifications": "Notifications",
   "about": "About",
-  "version": "Version"
+  "version": "Version",
+  "products": "Products",
+  "noProducts": "No Products",
+  "noProductsSubtitle": "No products found. Add some products to get started.",
+  "addProduct": "Add Product",
+  "noInvoices": "No Invoices",
+  "noInvoicesSubtitle": "No invoices found. Create some invoices to get started.",
+  "addInvoice": "Add Invoice",
+  "createInvoice": "Create Invoice",
+  "noPurchases": "No Purchases",
+  "noPurchasesSubtitle": "No purchases found. Create some purchases to get started.",
+  "addPurchase": "Add Purchase",
+  "createPurchase": "Create Purchase",
+  "noStock": "No Stock",
+  "noStockSubtitle": "No stock items found. Add some stock to get started.",
+  "addStock": "Add Stock"
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import '../../gen_l10n/app_localizations.dart';
 
-export 'package:flutter_gen/gen_l10n/app_localizations.dart';
+export '../../gen_l10n/app_localizations.dart';
 
 // Extension for easier access to localizations
 extension AppLocalizationsX on BuildContext {

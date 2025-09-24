@@ -3,7 +3,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import 'config/flavors.dart';
-import 'core/i18n/l10n.dart';
+import 'gen_l10n/app_localizations.dart';
 import 'core/routing/app_router.dart';
 import 'core/theme/theme.dart';
 

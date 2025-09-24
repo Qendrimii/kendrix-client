@@ -35,7 +35,6 @@ class AppTheme {
     return ThemeData(
       useMaterial3: true,
       colorScheme: colorScheme,
-      fontFamily: 'Inter',
       
       // App Bar
       appBarTheme: AppBarTheme(
@@ -49,7 +48,6 @@ class AppTheme {
           fontSize: 22,
           fontWeight: FontWeight.w600,
           color: colorScheme.onSurface,
-          fontFamily: 'Inter',
         ),
       ),
 

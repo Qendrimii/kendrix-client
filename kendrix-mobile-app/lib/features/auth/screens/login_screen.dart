@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/auth/auth_repository.dart';
 import '../../../core/i18n/l10n.dart';
-import '../../../core/theme/theme.dart';
 import '../models/login_request.dart';
 
 class LoginScreen extends HookConsumerWidget {
@@ -227,20 +227,24 @@ class LoginScreen extends HookConsumerWidget {
     try {
       await ref.read(authStateProvider.notifier).login(request);
       
-      if (context.mounted) {
-        // Navigation will be handled by the auth guard in the router
+      // Check if login was successful
+      final authState = ref.read(authStateProvider);
+      if (authState.isAuthenticated && context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(context.l10n.loginFailed),
+            content: Text('Login successful! Welcome ${authState.user?.email}'),
             backgroundColor: Theme.of(context).colorScheme.primary,
           ),
         );
+        
+        // Let the router handle navigation automatically via auth guard
+        // The router will detect authentication and redirect from login to dashboard
       }
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(e.toString()),
+            content: Text('Login failed: ${e.toString()}'),
             backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );

@@ -1,5 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class TokenStorage {
   static const _accessTokenKey = 'access_token';
@@ -10,47 +12,98 @@ class TokenStorage {
     aOptions: AndroidOptions(
       encryptedSharedPreferences: true,
     ),
-    iOptions: IOSOptions(
-      accessibility: KeychainItemAccessibility.first_unlock_this_device,
-    ),
+    webOptions: WebOptions(),
   );
 
   Future<void> saveTokens({
     required String accessToken,
     required String refreshToken,
   }) async {
-    await Future.wait([
-      _storage.write(key: _accessTokenKey, value: accessToken),
-      _storage.write(key: _refreshTokenKey, value: refreshToken),
-    ]);
+    print('🔐 Saving tokens...');
+    
+    if (kIsWeb) {
+      // Use SharedPreferences for web
+      final prefs = await SharedPreferences.getInstance();
+      await Future.wait([
+        prefs.setString(_accessTokenKey, accessToken),
+        prefs.setString(_refreshTokenKey, refreshToken),
+      ]);
+      print('🔐 Tokens saved to SharedPreferences (web)');
+    } else {
+      // Use FlutterSecureStorage for mobile
+      await Future.wait([
+        _storage.write(key: _accessTokenKey, value: accessToken),
+        _storage.write(key: _refreshTokenKey, value: refreshToken),
+      ]);
+      print('🔐 Tokens saved to FlutterSecureStorage (mobile)');
+    }
   }
 
   Future<String?> getAccessToken() async {
-    return await _storage.read(key: _accessTokenKey);
+    if (kIsWeb) {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString(_accessTokenKey);
+      print('🔐 Retrieved access token from SharedPreferences: ${token != null}');
+      return token;
+    } else {
+      final token = await _storage.read(key: _accessTokenKey);
+      print('🔐 Retrieved access token from FlutterSecureStorage: ${token != null}');
+      return token;
+    }
   }
 
   Future<String?> getRefreshToken() async {
-    return await _storage.read(key: _refreshTokenKey);
+    if (kIsWeb) {
+      final prefs = await SharedPreferences.getInstance();
+      return prefs.getString(_refreshTokenKey);
+    } else {
+      return await _storage.read(key: _refreshTokenKey);
+    }
   }
 
   Future<void> clearTokens() async {
-    await Future.wait([
-      _storage.delete(key: _accessTokenKey),
-      _storage.delete(key: _refreshTokenKey),
-    ]);
+    print('🔐 Clearing tokens...');
+    
+    if (kIsWeb) {
+      final prefs = await SharedPreferences.getInstance();
+      await Future.wait([
+        prefs.remove(_accessTokenKey),
+        prefs.remove(_refreshTokenKey),
+      ]);
+    } else {
+      await Future.wait([
+        _storage.delete(key: _accessTokenKey),
+        _storage.delete(key: _refreshTokenKey),
+      ]);
+    }
   }
 
   Future<void> setSelectedTenantId(int tenantId) async {
-    await _storage.write(key: _selectedTenantIdKey, value: tenantId.toString());
+    if (kIsWeb) {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setInt(_selectedTenantIdKey, tenantId);
+    } else {
+      await _storage.write(key: _selectedTenantIdKey, value: tenantId.toString());
+    }
   }
 
   Future<int?> getSelectedTenantId() async {
-    final value = await _storage.read(key: _selectedTenantIdKey);
-    return value != null ? int.tryParse(value) : null;
+    if (kIsWeb) {
+      final prefs = await SharedPreferences.getInstance();
+      return prefs.getInt(_selectedTenantIdKey);
+    } else {
+      final value = await _storage.read(key: _selectedTenantIdKey);
+      return value != null ? int.tryParse(value) : null;
+    }
   }
 
   Future<void> clearSelectedTenant() async {
-    await _storage.delete(key: _selectedTenantIdKey);
+    if (kIsWeb) {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove(_selectedTenantIdKey);
+    } else {
+      await _storage.delete(key: _selectedTenantIdKey);
+    }
   }
 
   Future<bool> hasValidTokens() async {
@@ -60,7 +113,12 @@ class TokenStorage {
   }
 
   Future<void> clearAll() async {
-    await _storage.deleteAll();
+    if (kIsWeb) {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.clear();
+    } else {
+      await _storage.deleteAll();
+    }
   }
 }
 

@@ -1,21 +1,21 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'artikulli_baze.dart';
+import 'fatura.dart';
 
-part 'stoku.freezed.dart';
-part 'stoku.g.dart';
+part 'business_entities.freezed.dart';
+part 'business_entities.g.dart';
 
 @freezed
 class Stoku with _$Stoku {
   const factory Stoku({
     required int id,
-    @JsonKey(name: 'artikulli_baze_id') int? articleId,
-    @JsonKey(name: 'sasia_ne_stok') double? quantityInStock,
-    @JsonKey(name: 'sasia_minimale') double? minimumQuantity,
-    @JsonKey(name: 'sasia_maksimale') double? maximumQuantity,
-    @JsonKey(name: 'cmimi_mesatar') double? averagePrice,
-    @JsonKey(name: 'vlera_totale') double? totalValue,
-    @JsonKey(name: 'data_fundit_levizjes') DateTime? lastMovementDate,
-    @JsonKey(name: 'created_at') DateTime? createdAt,
-    @JsonKey(name: 'updated_at') DateTime? updatedAt,
+    @JsonKey(name: 'ProduktiId') int? articleId,
+    @JsonKey(name: 'Sasia') double? quantityInStock,
+    @JsonKey(name: 'LevelIRenditjes') int? reorderLevel,
+    @JsonKey(name: 'Lokacioni') String? location,
+    @JsonKey(name: 'DataEKrijimit') DateTime? createdAt,
+    @JsonKey(name: 'DataEModifikimit') DateTime? updatedAt,
+    @JsonKey(name: 'Fshire') bool? deleted,
     // Relations
     @JsonKey(name: 'artikulli_baze') ArtikulliBaze? article,
   }) = _Stoku;
@@ -27,18 +27,12 @@ class Stoku with _$Stoku {
 class MaterializedDaily with _$MaterializedDaily {
   const factory MaterializedDaily({
     required int id,
-    @JsonKey(name: 'data') DateTime? date,
-    @JsonKey(name: 'shitjet_neto') double? salesNet,
-    @JsonKey(name: 'shitjet_tvsh') double? salesVat,
-    @JsonKey(name: 'shitjet_totale') double? salesTotal,
-    @JsonKey(name: 'blerjet_neto') double? purchasesNet,
-    @JsonKey(name: 'blerjet_tvsh') double? purchasesVat,
-    @JsonKey(name: 'blerjet_totale') double? purchasesTotal,
-    @JsonKey(name: 'numri_faturave') int? invoiceCount,
-    @JsonKey(name: 'numri_blerje') int? purchaseCount,
-    @JsonKey(name: 'fatura_mesatare') double? averageInvoice,
-    @JsonKey(name: 'created_at') DateTime? createdAt,
-    @JsonKey(name: 'updated_at') DateTime? updatedAt,
+    @JsonKey(name: 'Ymd') DateTime? date,
+    @JsonKey(name: 'SalesNet') double? salesNet,
+    @JsonKey(name: 'SalesVat') double? salesVat,
+    @JsonKey(name: 'PurchasesNet') double? purchasesNet,
+    @JsonKey(name: 'PurchasesVat') double? purchasesVat,
+    @JsonKey(name: 'AvgTicket') double? averageTicket,
   }) = _MaterializedDaily;
 
   factory MaterializedDaily.fromJson(Map<String, dynamic> json) =>
@@ -99,7 +93,3 @@ class ZRaportet with _$ZRaportet {
   factory ZRaportet.fromJson(Map<String, dynamic> json) =>
       _$ZRaportetFromJson(json);
 }
-
-// Import related models
-import 'artikulli_baze.dart';
-import 'fatura.dart';

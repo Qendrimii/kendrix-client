@@ -1,0 +1,13 @@
+targets:
+  $default:
+    builders:
+      freezed:
+        enabled: true
+      json_serializable:
+        enabled: true
+      hive_generator:
+        enabled: true
+        options:
+          path: lib/
+      flutter_gen:
+        enabled: true

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-
+import 'package:go_router/go_router.dart';
 import '../../../core/i18n/l10n.dart';
 import '../../../core/theme/theme.dart';
+import '../../common_lists/providers/entity_providers.dart';
+import '../../../widgets/shimmer_box.dart';
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
@@ -51,37 +53,64 @@ class DashboardScreen extends ConsumerWidget {
   }
 
   Widget _buildKPISection(BuildContext context, AppLocalizations l10n, bool isMobile) {
-    final kpis = [
-      _KPIData(
-        title: l10n.salesNet,
-        value: '€12,345.67',
-        change: '+15.2%',
-        isPositive: true,
-        icon: Icons.trending_up,
-      ),
-      _KPIData(
-        title: l10n.salesVat,
-        value: '€2,469.13',
-        change: '+12.8%',
-        isPositive: true,
-        icon: Icons.receipt_long,
-      ),
-      _KPIData(
-        title: l10n.purchasesNet,
-        value: '€8,234.56',
-        change: '-5.4%',
-        isPositive: false,
-        icon: Icons.shopping_cart,
-      ),
-      _KPIData(
-        title: l10n.averageTicket,
-        value: '€45.67',
-        change: '+8.9%',
-        isPositive: true,
-        icon: Icons.receipt,
-      ),
-    ];
+    return Consumer(
+      builder: (context, ref, child) {
+        final dashboardStatsAsync = ref.watch(dashboardStatsProvider);
+        
+        return dashboardStatsAsync.when(
+          data: (stats) {
+            final kpis = [
+              _KPIData(
+                title: l10n.salesNet,
+                value: '€${stats.today['SalesNet']?.toStringAsFixed(2) ?? '0.00'}',
+                change: '+15.2%', // TODO: Calculate actual change
+                isPositive: true,
+                icon: Icons.trending_up,
+              ),
+              _KPIData(
+                title: l10n.salesVat,
+                value: '€${stats.today['SalesVat']?.toStringAsFixed(2) ?? '0.00'}',
+                change: '+12.8%', // TODO: Calculate actual change
+                isPositive: true,
+                icon: Icons.receipt_long,
+              ),
+              _KPIData(
+                title: l10n.purchasesNet,
+                value: '€${stats.monthly['monthlyRevenue']?.toStringAsFixed(2) ?? '0.00'}',
+                change: '-5.4%', // TODO: Calculate actual change
+                isPositive: false,
+                icon: Icons.shopping_cart,
+              ),
+              _KPIData(
+                title: l10n.averageTicket,
+                value: '€${stats.monthly['avgTicket']?.toStringAsFixed(2) ?? '0.00'}',
+                change: '+8.9%', // TODO: Calculate actual change
+                isPositive: true,
+                icon: Icons.receipt,
+              ),
+            ];
 
+            return GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: isMobile ? 2 : 4,
+                childAspectRatio: isMobile ? 1.2 : 1.5,
+                crossAxisSpacing: 16,
+                mainAxisSpacing: 16,
+              ),
+              itemCount: kpis.length,
+              itemBuilder: (context, index) => _buildKPICard(context, kpis[index]),
+            );
+          },
+          loading: () => _buildKPILoadingState(isMobile),
+          error: (error, stackTrace) => _buildKPIErrorState(context, error),
+        );
+      },
+    );
+  }
+
+  Widget _buildKPILoadingState(bool isMobile) {
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -91,8 +120,40 @@ class DashboardScreen extends ConsumerWidget {
         crossAxisSpacing: 16,
         mainAxisSpacing: 16,
       ),
-      itemCount: kpis.length,
-      itemBuilder: (context, index) => _buildKPICard(context, kpis[index]),
+      itemCount: 4,
+      itemBuilder: (context, index) => ShimmerBox(
+        height: 120,
+        borderRadiusObject: BorderRadius.circular(12),
+      ),
+    );
+  }
+
+  Widget _buildKPIErrorState(BuildContext context, Object error) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.error_outline,
+              size: 48,
+              color: Theme.of(context).colorScheme.error,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Failed to load dashboard data',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            const SizedBox(height: 4),
+            Text(
+              error.toString(),
+              style: Theme.of(context).textTheme.bodySmall,
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -252,7 +313,7 @@ class DashboardScreen extends ConsumerWidget {
         description: 'View and manage invoices',
         icon: Icons.receipt,
         onTap: () {
-          // TODO: Navigate to invoices
+          context.go('/fatura');
         },
       ),
       _QuickAction(
@@ -260,7 +321,7 @@ class DashboardScreen extends ConsumerWidget {
         description: 'Track purchase orders',
         icon: Icons.shopping_cart,
         onTap: () {
-          // TODO: Navigate to purchases
+          context.go('/blerjet');
         },
       ),
       _QuickAction(
@@ -268,7 +329,7 @@ class DashboardScreen extends ConsumerWidget {
         description: 'Monitor inventory levels',
         icon: Icons.inventory,
         onTap: () {
-          // TODO: Navigate to stock
+          context.go('/stoku');
         },
       ),
       _QuickAction(
@@ -276,7 +337,7 @@ class DashboardScreen extends ConsumerWidget {
         description: 'Generate business reports',
         icon: Icons.assessment,
         onTap: () {
-          // TODO: Navigate to reports
+          context.go('/zraportet');
         },
       ),
     ];
@@ -384,5 +445,3 @@ class _QuickAction {
     required this.onTap,
   });
 }
-
-import '../../../core/theme/theme.dart';
