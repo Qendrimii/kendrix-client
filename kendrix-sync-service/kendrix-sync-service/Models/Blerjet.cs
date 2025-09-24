@@ -5,6 +5,7 @@ namespace kendrix_sync_service.Models
     public class Blerjet : BaseEntity
     {
         public DateTime? DataEFatures { get; set; }
+        public bool? Fshire { get; set; }
         public string NrFatures { get; set; }
         public DateTime? AfatiPageses { get; set; }
         public int? BlerjeKategoriaId { get; set; }

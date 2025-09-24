@@ -13,6 +13,7 @@ namespace kendrix_sync_service.Models
         public bool? Aktive { get; set; }
         public int? ShfrytezuesiId { get; set; }
         public decimal? Tvsh { get; set; }
+        public bool? Fshire { get; set; }
     }
 }
 

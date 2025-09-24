@@ -7,6 +7,7 @@ namespace kendrix_sync_service.Models
         public int ProduktiId { get; set; }
         public decimal Sasia { get; set; }
         public decimal CmimiNjesi { get; set; }
+        public bool? Fshire { get; set; }
         public int? BlerjaId { get; set; }
         public DateTime? PorosiaDate { get; set; }
         public decimal? Tvsh { get; set; }

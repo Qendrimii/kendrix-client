@@ -20,6 +20,7 @@ namespace kendrix_sync_service.Models
         public int? KontojaArketueshme { get; set; }
         public int? KontojaPagueshme { get; set; }
         public decimal? Limiti { get; set; }
+        public bool? Fshire { get; set; }
     }
 }
 

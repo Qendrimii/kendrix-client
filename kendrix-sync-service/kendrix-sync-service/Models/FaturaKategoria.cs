@@ -8,6 +8,7 @@ namespace kendrix_sync_service.Models
         public string Kodi { get; set; }
         public string Pershkrimi { get; set; }
         public int? TvshId { get; set; }
+        public bool? Fshire { get; set; }
     }
 }
 

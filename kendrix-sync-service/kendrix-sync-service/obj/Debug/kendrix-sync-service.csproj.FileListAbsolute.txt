@@ -1,5 +1,3 @@
-C:\Users\qendr\OneDrive\Desktop\Personal\Personal-projects\kendrix-client\kendrix-sync-service\kendrix-sync-service\obj\Debug\kendrix-sync-service.csproj.AssemblyReference.cache
-C:\Users\qendr\OneDrive\Desktop\Personal\Personal-projects\kendrix-client\kendrix-sync-service\kendrix-sync-service\obj\Debug\kendrix-sync-service.csproj.SuggestedBindingRedirects.cache
 C:\Users\qendr\OneDrive\Desktop\Personal\Personal-projects\kendrix-client\kendrix-sync-service\kendrix-sync-service\obj\Debug\kendrix-sync-service.exe.config
 C:\Users\qendr\OneDrive\Desktop\Personal\Personal-projects\kendrix-client\kendrix-sync-service\kendrix-sync-service\obj\Debug\kendrix-sync-service.csproj.CoreCompileInputs.cache
 C:\Users\qendr\OneDrive\Desktop\Personal\Personal-projects\kendrix-client\kendrix-sync-service\kendrix-sync-service\bin\Debug\kendrix-sync-service.exe.config
@@ -23,3 +21,4 @@ C:\Users\qendr\OneDrive\Desktop\Personal\Personal-projects\kendrix-client\kendri
 C:\Users\qendr\OneDrive\Desktop\Personal\Personal-projects\kendrix-client\kendrix-sync-service\kendrix-sync-service\obj\Debug\kendrix-sync-service.csproj.CopyComplete
 C:\Users\qendr\OneDrive\Desktop\Personal\Personal-projects\kendrix-client\kendrix-sync-service\kendrix-sync-service\obj\Debug\kendrix-sync-service.exe
 C:\Users\qendr\OneDrive\Desktop\Personal\Personal-projects\kendrix-client\kendrix-sync-service\kendrix-sync-service\obj\Debug\kendrix-sync-service.pdb
+C:\Users\qendr\OneDrive\Desktop\Personal\Personal-projects\kendrix-client\kendrix-sync-service\kendrix-sync-service\obj\Debug\kendrix-sync-service.csprojAssemblyReference.cache

@@ -32,6 +32,7 @@ namespace kendrix_sync_service.Services
             "Blerjet",
             "PorositeEBlerjes",
             "Stoku",
+            "Tavolina",
             "Normativa",
             "ZRaportet"
         };
@@ -220,6 +221,10 @@ namespace kendrix_sync_service.Services
                         var stokuData = await _databaseService.GetDataAsync<Stoku>(tableName, fromVersion);
                         data = stokuData.Select(ConvertToDictionary).ToList();
                         break;
+                    case "Tavolina":
+                        var tavolinaData = await _databaseService.GetDataAsync<Tavolina>(tableName, fromVersion);
+                        data = tavolinaData.Select(ConvertToDictionary).ToList();
+                        break;
                     case "Normativa":
                         var normativaData = await _databaseService.GetDataAsync<Normativa>(tableName, fromVersion);
                         data = normativaData.Select(ConvertToDictionary).ToList();
@@ -252,13 +257,29 @@ namespace kendrix_sync_service.Services
             // Add operation type
             dictionary["op"] = "upsert";
 
+            // Get the expected fields for this entity type
+            var expectedFields = GetExpectedFields<T>();
+            
             // Get all properties and convert to dictionary
             var properties = typeof(T).GetProperties();
             foreach (var property in properties)
             {
+                // Only include fields that are expected by the API
+                if (!expectedFields.Contains(property.Name))
+                {
+                    continue;
+                }
+                
                 var value = property.GetValue(entity);
                 
-                // Skip null values for optional fields
+                // Handle nullable boolean fields (like Fshire) with default values
+                if (value == null && property.PropertyType == typeof(bool?))
+                {
+                    dictionary[property.Name] = false; // Default to false for nullable booleans
+                    continue;
+                }
+                
+                // Skip null values for other optional fields
                 if (value == null && property.PropertyType.IsGenericType && 
                     property.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
                 {
@@ -286,6 +307,84 @@ namespace kendrix_sync_service.Services
             }
 
             return dictionary;
+        }
+
+        private HashSet<string> GetExpectedFields<T>() where T : BaseEntity
+        {
+            var entityType = typeof(T);
+            var expectedFields = new HashSet<string>();
+            
+            // Define expected fields for each entity type based on API structure
+            if (entityType == typeof(Subjektet))
+            {
+                expectedFields = new HashSet<string> { "Id", "Kodi", "Emertimi", "Furnitor", "Bleres", "NrUnik", "NoFiskal", "NoTVSH", "NIB", "Adresa", "Telefoni", "Email", "Rabati", "Pershkrimi", "KontojaArketueshme", "KontojaPagueshme", "Limiti", "Fshire", "DataEKrijimit", "DataEModifikimit" };
+            }
+            else if (entityType == typeof(TVSH))
+            {
+                expectedFields = new HashSet<string> { "Id", "DataEKrijimit", "DataEModifikimit", "Fshire", "Perqindja", "Grupi" };
+            }
+            else if (entityType == typeof(Kategoria))
+            {
+                expectedFields = new HashSet<string> { "Id", "Emri", "Color", "Printer", "Lloji", "EmriNePrinter", "DataEKrijimit", "DataEModifikimit" };
+            }
+            else if (entityType == typeof(ArtikulliBaze))
+            {
+                expectedFields = new HashSet<string> { "Id", "Artikull", "Sherbim", "Shifra", "Emri", "Njesia", "Barkodi", "Cmimi_I_Shitjes_Cope", "Cmimi_I_Shitjes_Pako", "SasiaPako", "KategoriaId", "Aktiv", "ArtikullIPerbere", "EmriGjenerik", "Prodhuesi", "ArtNgaPeshorja", "DataEKrijimit", "DataEModifikimit", "TvshId", "EmertimiiDyte", "PeshaNeto", "PeshaBruto", "Gjatesia", "Gjersia", "Lartesia", "SasiaMinimale", "SasiaMaksimale", "Afatshkurte", "Afatgjate", "NormaZhvleresimit", "DataEFillimitTeZhvlersimit", "TempId", "Skadimi", "Ambalazhi", "IRimbursueshem", "OrigjinaEMallit", "KostoEProdhimit", "Rafti", "KodiDoganor", "SubjektiId", "IncomeAccountId", "ExpenseAccountId", "IsGroup", "GroupId" };
+            }
+            else if (entityType == typeof(Shfrytezuesi))
+            {
+                expectedFields = new HashSet<string> { "Id", "DataEKrijimit", "DataEModifikimit", "Fshire", "Username", "Email", "Tel", "Aktiv", "Color", "RoleId", "PunetoriId" };
+            }
+            else if (entityType == typeof(FaturaKategoria))
+            {
+                expectedFields = new HashSet<string> { "Id", "Emri", "Kodi", "Pershkrimi", "TvshId", "DataEKrijimit", "DataEModifikimit", "Fshire" };
+            }
+            else if (entityType == typeof(BlerjeKategoria))
+            {
+                expectedFields = new HashSet<string> { "Id", "Emri", "Kodi", "Pershkrimi", "TvshId", "DataEKrijimit", "DataEModifikimit", "Fshire" };
+            }
+            else if (entityType == typeof(MenyraPageses))
+            {
+                expectedFields = new HashSet<string> { "Id", "Kodi", "Emertimi", "Kontoja", "FiskalType", "PosEnabled", "DataEKrijimit", "DataEModifikimit", "POSBorgji", "KontojaKalimtare", "KontimneKontoKalimtare", "KontojaeProvizioneve", "BankaId", "JoFiskal" };
+            }
+            else if (entityType == typeof(Pagesat))
+            {
+                expectedFields = new HashSet<string> { "Id", "DataPageses", "MenyraPagesesId", "Totali", "ShumaPaguar", "ArkaId", "BankaId", "Referenca", "Komenti", "Memo", "KrijuarNga", "DataEModifikimit", "Valuta", "KursiKembimit" };
+            }
+            else if (entityType == typeof(Fatura))
+            {
+                expectedFields = new HashSet<string> { "Id", "Data", "Fshire", "ShfrytezuesiId", "NrFatures", "AfatiPageses", "Staff", "FaturaKategoriaId", "DataEKrijimit", "DataEModifikimit", "KodiValues", "KursiKembimit", "SubjektiId", "StatusFatureId", "PagesaId", "Comment" };
+            }
+            else if (entityType == typeof(Porosia))
+            {
+                expectedFields = new HashSet<string> { "Id", "DataEKrijimit", "DataEModifikimit", "Fshire", "FaturaId", "ProduktiId", "Cmimi", "Sasia", "Rabati", "IdTavolina", "Aktive", "ShfrytezuesiId", "Tvsh" };
+            }
+            else if (entityType == typeof(Blerjet))
+            {
+                expectedFields = new HashSet<string> { "Id", "DataEFatures", "DataEKrijimit", "DataEModifikimit", "Fshire", "NrFatures", "AfatiPageses", "BlerjeKategoriaId", "NumriFaturesSeFurnitorit", "Fatura", "Staff", "SubjektiId", "PagesaId", "StatusFatureId", "OptimisticLockField", "fTotalPorosias", "fTotalVAT", "TotalPorosias", "TotalVAT", "ArkaId", "MenyraPagesesId" };
+            }
+            else if (entityType == typeof(PorositeEBlerjes))
+            {
+                expectedFields = new HashSet<string> { "Id", "ProduktiId", "Sasia", "CmimiNjesi", "DataEKrijimit", "DataEModifikimit", "Fshire", "BlerjaId", "PorosiaDate", "Tvsh", "Rabati", "Total" };
+            }
+            else if (entityType == typeof(Stoku))
+            {
+                expectedFields = new HashSet<string> { "Id", "ProduktiId", "Sasia", "LevelIRenditjes", "DataEKrijimit", "DataEModifikimit", "Fshire", "Lokacioni" };
+            }
+            else if (entityType == typeof(Tavolina))
+            {
+                expectedFields = new HashSet<string> { "Id", "DataEKrijimit", "DataEModifikimit", "Fshire", "Emri", "SallaId", "ShfrytezuesiId", "Statusi", "RestTableX", "RestTableY", "SizeX", "SizeY", "RegDate", "TableColorR", "TableColorG", "TableColorB" };
+            }
+            else if (entityType == typeof(Normativa))
+            {
+                expectedFields = new HashSet<string> { "Id", "ArtikulliBazeId", "Norma", "DataEKrijimit", "DataEModifikimit" };
+            }
+            else if (entityType == typeof(ZRaportet))
+            {
+                expectedFields = new HashSet<string> { "Id", "DataEKrijimit", "DataEModifikimit", "ShumaShitjeProgram", "ShumaNeZRaport" };
+            }
+            
+            return expectedFields;
         }
 
         private BatchRequest CreateBatchRequest(string tableName, long fromVersion, long toVersion, List<Dictionary<string, object>> rows)

@@ -4,6 +4,7 @@ namespace kendrix_sync_service.Models
 {
     public class Tavolina : BaseEntity
     {
+        public bool? Fshire { get; set; }
         public string Emri { get; set; }
         public int SallaId { get; set; }
         public int? ShfrytezuesiId { get; set; }

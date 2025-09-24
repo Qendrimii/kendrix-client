@@ -4,6 +4,7 @@ namespace kendrix_sync_service.Models
 {
     public class Shfrytezuesi : BaseEntity
     {
+        public bool? Fshire { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
         public string Email { get; set; }

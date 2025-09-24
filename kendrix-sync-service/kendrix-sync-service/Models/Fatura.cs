@@ -5,6 +5,7 @@ namespace kendrix_sync_service.Models
     public class Fatura : BaseEntity
     {
         public DateTime? Data { get; set; }
+        public bool? Fshire { get; set; }
         public int? ShfrytezuesiId { get; set; }
         public string NrFatures { get; set; }
         public DateTime? AfatiPageses { get; set; }
