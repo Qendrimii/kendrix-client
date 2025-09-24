@@ -1,0 +1,1592 @@
+{
+	"info": {
+		"_postman_id": "kendrix-sync-api-collection",
+		"name": "Kendrix Sync API",
+		"description": "Complete API collection for Kendrix Sync API - PHP 7.4 Compatible",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "kendrix-sync-api"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Generate JWT Token",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/generate_token.php",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"generate_token.php"
+							]
+						},
+						"description": "Generate a JWT token for authentication. Run this first to get a valid token."
+					},
+					"response": []
+				}
+			],
+			"description": "Authentication endpoints and token generation"
+		},
+		{
+			"name": "Health & Status",
+			"item": [
+				{
+					"name": "Health Check",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/health.php",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"health.php"
+							]
+						},
+						"description": "Complete health check with database status (no auth required)"
+					},
+					"response": []
+				},
+				{
+					"name": "Heartbeat",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
+							},
+							{
+								"key": "X-Tenant-External-Key",
+								"value": "{{tenant_key}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/sync/v1/heartbeat",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sync",
+								"v1",
+								"heartbeat"
+							]
+						},
+						"description": "Simple heartbeat check (auth required)"
+					},
+					"response": []
+				},
+				{
+					"name": "Contract",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
+							},
+							{
+								"key": "X-Tenant-External-Key",
+								"value": "{{tenant_key}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/sync/v1/contract",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sync",
+								"v1",
+								"contract"
+							]
+						},
+						"description": "Get API contract information including supported tables and ordering"
+					},
+					"response": []
+				}
+			],
+			"description": "Health check and status endpoints"
+		},
+		{
+			"name": "Data Synchronization - Complete",
+			"item": [
+				{
+					"name": "1. Batch Sync - Subjektet",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
+							},
+							{
+								"key": "X-Tenant-External-Key",
+								"value": "{{tenant_key}}",
+								"type": "text"
+							},
+							{
+								"key": "X-Idempotency-Key",
+								"value": "{{$timestamp}}-subjektet-{{$randomInt}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"table\": \"Subjektet\",\n  \"fromVersion\": 1000,\n  \"toVersion\": 1001,\n  \"rows\": [\n    {\n      \"Id\": 1001,\n      \"op\": \"upsert\",\n      \"Kodi\": \"SUB-001\",\n      \"Emertimi\": \"Test Subject 1\",\n      \"Furnitor\": 0,\n      \"Bleres\": 1,\n      \"NrUnik\": \"123456789\",\n      \"NoFiskal\": \"FISKAL-001\",\n      \"NoTVSH\": \"TVSH-001\",\n      \"NIB\": \"NIB-001\",\n      \"Adresa\": \"Test Address 1\",\n      \"Telefoni\": \"+1234567890\",\n      \"Email\": \"test1@example.com\",\n      \"Rabati\": 5.00,\n      \"Pershkrimi\": \"Test subject description\",\n      \"Fshire\": 0,\n      \"DataEKrijimit\": \"{{$isoTimestamp}}\",\n      \"DataEModifikimit\": \"{{$isoTimestamp}}\"\n    },\n    {\n      \"Id\": 1002,\n      \"op\": \"upsert\",\n      \"Kodi\": \"SUB-002\",\n      \"Emertimi\": \"Test Subject 2\",\n      \"Furnitor\": 1,\n      \"Bleres\": 0,\n      \"NrUnik\": \"987654321\",\n      \"NoFiskal\": \"FISKAL-002\",\n      \"NoTVSH\": \"TVSH-002\",\n      \"NIB\": \"NIB-002\",\n      \"Adresa\": \"Test Address 2\",\n      \"Telefoni\": \"+0987654321\",\n      \"Email\": \"test2@example.com\",\n      \"Rabati\": 10.00,\n      \"Pershkrimi\": \"Test supplier description\",\n      \"Fshire\": 0,\n      \"DataEKrijimit\": \"{{$isoTimestamp}}\",\n      \"DataEModifikimit\": \"{{$isoTimestamp}}\"\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/sync/v1/batch",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sync",
+								"v1",
+								"batch"
+							]
+						},
+						"description": "Sync Subjektet table data (customers/suppliers)"
+					},
+					"response": []
+				},
+				{
+					"name": "2. Batch Sync - TVSH",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
+							},
+							{
+								"key": "X-Tenant-External-Key",
+								"value": "{{tenant_key}}",
+								"type": "text"
+							},
+							{
+								"key": "X-Idempotency-Key",
+								"value": "{{$timestamp}}-tvsh-{{$randomInt}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"table\": \"TVSH\",\n  \"fromVersion\": 1000,\n  \"toVersion\": 1001,\n  \"rows\": [\n    {\n      \"Id\": 1,\n      \"op\": \"upsert\",\n      \"Perqindja\": 18.00,\n      \"Grupi\": \"Standard\",\n      \"Fshire\": 0,\n      \"DataEKrijimit\": \"{{$isoTimestamp}}\",\n      \"DataEModifikimit\": \"{{$isoTimestamp}}\"\n    },\n    {\n      \"Id\": 2,\n      \"op\": \"upsert\",\n      \"Perqindja\": 0.00,\n      \"Grupi\": \"Zero Rate\",\n      \"Fshire\": 0,\n      \"DataEKrijimit\": \"{{$isoTimestamp}}\",\n      \"DataEModifikimit\": \"{{$isoTimestamp}}\"\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/sync/v1/batch",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sync",
+								"v1",
+								"batch"
+							]
+						},
+						"description": "Sync TVSH (VAT) table data"
+					},
+					"response": []
+				},
+				{
+					"name": "3. Batch Sync - Kategoria",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
+							},
+							{
+								"key": "X-Tenant-External-Key",
+								"value": "{{tenant_key}}",
+								"type": "text"
+							},
+							{
+								"key": "X-Idempotency-Key",
+								"value": "{{$timestamp}}-kategoria-{{$randomInt}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"table\": \"Kategoria\",\n  \"fromVersion\": 1000,\n  \"toVersion\": 1001,\n  \"rows\": [\n    {\n      \"Id\": 1,\n      \"op\": \"upsert\",\n      \"Emri\": \"Food & Beverages\",\n      \"Color\": \"#FF5733\",\n      \"Printer\": \"Kitchen\",\n      \"Lloji\": 1,\n      \"EmriNePrinter\": \"FOOD\",\n      \"DataEKrijimit\": \"{{$isoTimestamp}}\",\n      \"DataEModifikimit\": \"{{$isoTimestamp}}\"\n    },\n    {\n      \"Id\": 2,\n      \"op\": \"upsert\",\n      \"Emri\": \"Electronics\",\n      \"Color\": \"#33A1FF\",\n      \"Printer\": \"Main\",\n      \"Lloji\": 2,\n      \"EmriNePrinter\": \"ELECTRONICS\",\n      \"DataEKrijimit\": \"{{$isoTimestamp}}\",\n      \"DataEModifikimit\": \"{{$isoTimestamp}}\"\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/sync/v1/batch",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sync",
+								"v1",
+								"batch"
+							]
+						},
+						"description": "Sync Kategoria (Categories) table data"
+					},
+					"response": []
+				},
+				{
+					"name": "4. Batch Sync - ArtikulliBaze",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
+							},
+							{
+								"key": "X-Tenant-External-Key",
+								"value": "{{tenant_key}}",
+								"type": "text"
+							},
+							{
+								"key": "X-Idempotency-Key",
+								"value": "{{$timestamp}}-artikullibaze-{{$randomInt}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"table\": \"ArtikulliBaze\",\n  \"fromVersion\": 1000,\n  \"toVersion\": 1001,\n  \"rows\": [\n    {\n      \"Id\": 1001,\n      \"op\": \"upsert\",\n      \"Artikull\": 1,\n      \"Sherbim\": 0,\n      \"Shifra\": \"ART-001\",\n      \"Emri\": \"Test Product 1\",\n      \"Njesia\": \"Cope\",\n      \"Barkodi\": \"1234567890123\",\n      \"Cmimi_I_Shitjes_Cope\": 10.50,\n      \"Cmimi_I_Shitjes_Pako\": 100.00,\n      \"SasiaPako\": 10,\n      \"KategoriaId\": 1,\n      \"Aktiv\": 1,\n      \"ArtikullIPerbere\": 0,\n      \"EmriGjenerik\": \"Generic Name 1\",\n      \"Prodhuesi\": \"Test Producer 1\",\n      \"ArtNgaPeshorja\": 0,\n      \"DataEKrijimit\": \"{{$isoTimestamp}}\",\n      \"DataEModifikimit\": \"{{$isoTimestamp}}\",\n      \"TvshId\": 1,\n      \"EmertimiiDyte\": \"Alternative Name 1\",\n      \"PeshaNeto\": 0.5,\n      \"PeshaBruto\": 0.6,\n      \"Gjatesia\": 10.0,\n      \"Gjersia\": 5.0,\n      \"Lartesia\": 2.0,\n      \"SasiaMinimale\": 1.0,\n      \"SasiaMaksimale\": 100.0,\n      \"Afatshkurte\": 0,\n      \"Afatgjate\": 0,\n      \"NormaZhvleresimit\": 10.00,\n      \"DataEFillimitTeZhvlersimit\": \"2025-01-01\",\n      \"Skadimi\": \"2026-01-01\",\n      \"Ambalazhi\": \"Box\",\n      \"IRimbursueshem\": 1,\n      \"OrigjinaEMallit\": \"Albania\",\n      \"KostoEProdhimit\": 5,\n      \"Rafti\": \"A-1\",\n      \"KodiDoganor\": \"CUSTOMS-001\",\n      \"SubjektiId\": 1001,\n      \"IncomeAccountId\": 1001,\n      \"ExpenseAccountId\": 2001,\n      \"IsGroup\": 0,\n      \"GroupId\": null\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/sync/v1/batch",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sync",
+								"v1",
+								"batch"
+							]
+						},
+						"description": "Sync ArtikulliBaze (Products) table data"
+					},
+					"response": []
+				},
+				{
+					"name": "5. Batch Sync - Shfrytezuesi",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
+							},
+							{
+								"key": "X-Tenant-External-Key",
+								"value": "{{tenant_key}}",
+								"type": "text"
+							},
+							{
+								"key": "X-Idempotency-Key",
+								"value": "{{$timestamp}}-shfrytezuesi-{{$randomInt}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"table\": \"Shfrytezuesi\",\n  \"fromVersion\": 1000,\n  \"toVersion\": 1001,\n  \"rows\": [\n    {\n      \"Id\": 1,\n      \"op\": \"upsert\",\n      \"Username\": \"admin\",\n      \"Email\": \"admin@kendrix.com\",\n      \"Tel\": \"+1234567890\",\n      \"Aktiv\": 1,\n      \"Color\": \"#FF0000\",\n      \"RoleId\": 1,\n      \"PunetoriId\": 1,\n      \"Fshire\": 0,\n      \"DataEKrijimit\": \"{{$isoTimestamp}}\",\n      \"DataEModifikimit\": \"{{$isoTimestamp}}\"\n    },\n    {\n      \"Id\": 2,\n      \"op\": \"upsert\",\n      \"Username\": \"cashier\",\n      \"Email\": \"cashier@kendrix.com\",\n      \"Tel\": \"+0987654321\",\n      \"Aktiv\": 1,\n      \"Color\": \"#00FF00\",\n      \"RoleId\": 2,\n      \"PunetoriId\": 2,\n      \"Fshire\": 0,\n      \"DataEKrijimit\": \"{{$isoTimestamp}}\",\n      \"DataEModifikimit\": \"{{$isoTimestamp}}\"\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/sync/v1/batch",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sync",
+								"v1",
+								"batch"
+							]
+						},
+						"description": "Sync Shfrytezuesi (Users) table data"
+					},
+					"response": []
+				},
+				{
+					"name": "6. Batch Sync - FaturaKategoria",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
+							},
+							{
+								"key": "X-Tenant-External-Key",
+								"value": "{{tenant_key}}",
+								"type": "text"
+							},
+							{
+								"key": "X-Idempotency-Key",
+								"value": "{{$timestamp}}-faturakategoria-{{$randomInt}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"table\": \"FaturaKategoria\",\n  \"fromVersion\": 1000,\n  \"toVersion\": 1001,\n  \"rows\": [\n    {\n      \"Id\": 1,\n      \"op\": \"upsert\",\n      \"Emri\": \"Standard Invoice\",\n      \"Kodi\": \"INV-STD\",\n      \"Pershkrimi\": \"Standard invoice category\",\n      \"TvshId\": 1,\n      \"Fshire\": 0,\n      \"DataEKrijimit\": \"{{$isoTimestamp}}\",\n      \"DataEModifikimit\": \"{{$isoTimestamp}}\"\n    },\n    {\n      \"Id\": 2,\n      \"op\": \"upsert\",\n      \"Emri\": \"Credit Note\",\n      \"Kodi\": \"INV-CREDIT\",\n      \"Pershkrimi\": \"Credit note category\",\n      \"TvshId\": 1,\n      \"Fshire\": 0,\n      \"DataEKrijimit\": \"{{$isoTimestamp}}\",\n      \"DataEModifikimit\": \"{{$isoTimestamp}}\"\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/sync/v1/batch",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sync",
+								"v1",
+								"batch"
+							]
+						},
+						"description": "Sync FaturaKategoria (Invoice Categories) table data"
+					},
+					"response": []
+				},
+				{
+					"name": "7. Batch Sync - BlerjeKategoria",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
+							},
+							{
+								"key": "X-Tenant-External-Key",
+								"value": "{{tenant_key}}",
+								"type": "text"
+							},
+							{
+								"key": "X-Idempotency-Key",
+								"value": "{{$timestamp}}-blerjekategoria-{{$randomInt}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"table\": \"BlerjeKategoria\",\n  \"fromVersion\": 1000,\n  \"toVersion\": 1001,\n  \"rows\": [\n    {\n      \"Id\": 1,\n      \"op\": \"upsert\",\n      \"Emri\": \"Office Supplies\",\n      \"Kodi\": \"BL-001\",\n      \"Pershkrimi\": \"Office supplies category\",\n      \"TvshId\": 1,\n      \"Fshire\": 0,\n      \"DataEKrijimit\": \"{{$isoTimestamp}}\",\n      \"DataEModifikimit\": \"{{$isoTimestamp}}\"\n    },\n    {\n      \"Id\": 2,\n      \"op\": \"upsert\",\n      \"Emri\": \"Equipment\",\n      \"Kodi\": \"BL-002\",\n      \"Pershkrimi\": \"Equipment category\",\n      \"TvshId\": 1,\n      \"Fshire\": 0,\n      \"DataEKrijimit\": \"{{$isoTimestamp}}\",\n      \"DataEModifikimit\": \"{{$isoTimestamp}}\"\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/sync/v1/batch",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sync",
+								"v1",
+								"batch"
+							]
+						},
+						"description": "Sync BlerjeKategoria (Purchase Categories) table data"
+					},
+					"response": []
+				},
+				{
+					"name": "8. Batch Sync - MenyraPageses",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
+							},
+							{
+								"key": "X-Tenant-External-Key",
+								"value": "{{tenant_key}}",
+								"type": "text"
+							},
+							{
+								"key": "X-Idempotency-Key",
+								"value": "{{$timestamp}}-menyrapageses-{{$randomInt}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"table\": \"MenyraPageses\",\n  \"fromVersion\": 1000,\n  \"toVersion\": 1001,\n  \"rows\": [\n    {\n      \"Id\": 1,\n      \"op\": \"upsert\",\n      \"Kodi\": \"CASH\",\n      \"Emertimi\": \"Cash Payment\",\n      \"Kontoja\": 1001,\n      \"FiskalType\": 1,\n      \"PosEnabled\": 1,\n      \"POSBorgji\": 0,\n      \"KontojaKalimtare\": \"1002\",\n      \"KontimneKontoKalimtare\": 1,\n      \"KontojaeProvizioneve\": \"1003\",\n      \"BankaId\": 1,\n      \"JoFiskal\": 0,\n      \"DataEKrijimit\": \"{{$isoTimestamp}}\",\n      \"DataEModifikimit\": \"{{$isoTimestamp}}\"\n    },\n    {\n      \"Id\": 2,\n      \"op\": \"upsert\",\n      \"Kodi\": \"CARD\",\n      \"Emertimi\": \"Card Payment\",\n      \"Kontoja\": 2001,\n      \"FiskalType\": 2,\n      \"PosEnabled\": 1,\n      \"POSBorgji\": 0,\n      \"KontojaKalimtare\": \"2002\",\n      \"KontimneKontoKalimtare\": 1,\n      \"KontojaeProvizioneve\": \"2003\",\n      \"BankaId\": 1,\n      \"JoFiskal\": 0,\n      \"DataEKrijimit\": \"{{$isoTimestamp}}\",\n      \"DataEModifikimit\": \"{{$isoTimestamp}}\"\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/sync/v1/batch",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sync",
+								"v1",
+								"batch"
+							]
+						},
+						"description": "Sync MenyraPageses (Payment Methods) table data"
+					},
+					"response": []
+				},
+				{
+					"name": "9. Batch Sync - Pagesat",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
+							},
+							{
+								"key": "X-Tenant-External-Key",
+								"value": "{{tenant_key}}",
+								"type": "text"
+							},
+							{
+								"key": "X-Idempotency-Key",
+								"value": "{{$timestamp}}-pagesat-{{$randomInt}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"table\": \"Pagesat\",\n  \"fromVersion\": 1000,\n  \"toVersion\": 1001,\n  \"rows\": [\n    {\n      \"Id\": 1001,\n      \"op\": \"upsert\",\n      \"DataPageses\": \"{{$isoTimestamp}}\",\n      \"MenyraPagesesId\": 1,\n      \"Totali\": 100.00,\n      \"ShumaPaguar\": 100.00,\n      \"ArkaId\": 1,\n      \"BankaId\": 1,\n      \"Referenca\": \"REF-001\",\n      \"Komenti\": \"Payment comment\",\n      \"Memo\": \"Payment memo\",\n      \"KrijuarNga\": \"admin\",\n      \"DataEModifikimit\": \"{{$isoTimestamp}}\",\n      \"Valuta\": \"EUR\",\n      \"KursiKembimit\": 1.0000\n    },\n    {\n      \"Id\": 1002,\n      \"op\": \"upsert\",\n      \"DataPageses\": \"{{$isoTimestamp}}\",\n      \"MenyraPagesesId\": 2,\n      \"Totali\": 50.00,\n      \"ShumaPaguar\": 50.00,\n      \"ArkaId\": 1,\n      \"BankaId\": 1,\n      \"Referenca\": \"REF-002\",\n      \"Komenti\": \"Card payment comment\",\n      \"Memo\": \"Card payment memo\",\n      \"KrijuarNga\": \"cashier\",\n      \"DataEModifikimit\": \"{{$isoTimestamp}}\",\n      \"Valuta\": \"EUR\",\n      \"KursiKembimit\": 1.0000\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/sync/v1/batch",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sync",
+								"v1",
+								"batch"
+							]
+						},
+						"description": "Sync Pagesat (Payments) table data"
+					},
+					"response": []
+				},
+				{
+					"name": "10. Batch Sync - Fatura",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
+							},
+							{
+								"key": "X-Tenant-External-Key",
+								"value": "{{tenant_key}}",
+								"type": "text"
+							},
+							{
+								"key": "X-Idempotency-Key",
+								"value": "{{$timestamp}}-fatura-{{$randomInt}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"table\": \"Fatura\",\n  \"fromVersion\": 1000,\n  \"toVersion\": 1001,\n  \"rows\": [\n    {\n      \"Id\": 1001,\n      \"op\": \"upsert\",\n      \"Data\": \"{{$isoTimestamp}}\",\n      \"Fshire\": 0,\n      \"ShfrytezuesiId\": 1,\n      \"NrFatures\": \"F-2025-001\",\n      \"AfatiPageses\": \"2025-10-16\",\n      \"Staff\": 0,\n      \"FaturaKategoriaId\": 1,\n      \"DataEKrijimit\": \"{{$isoTimestamp}}\",\n      \"DataEModifikimit\": \"{{$isoTimestamp}}\",\n      \"KodiValues\": \"EUR\",\n      \"KursiKembimit\": 1.0000,\n      \"SubjektiId\": 1001,\n      \"StatusFatureId\": 1,\n      \"PagesaId\": 1001,\n      \"Comment\": \"Test invoice comment\"\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/sync/v1/batch",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sync",
+								"v1",
+								"batch"
+							]
+						},
+						"description": "Sync Fatura (Invoices) table data"
+					},
+					"response": []
+				},
+				{
+					"name": "11. Batch Sync - Porosia",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
+							},
+							{
+								"key": "X-Tenant-External-Key",
+								"value": "{{tenant_key}}",
+								"type": "text"
+							},
+							{
+								"key": "X-Idempotency-Key",
+								"value": "{{$timestamp}}-porosia-{{$randomInt}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"table\": \"Porosia\",\n  \"fromVersion\": 1000,\n  \"toVersion\": 1001,\n  \"rows\": [\n    {\n      \"Id\": 1001,\n      \"op\": \"upsert\",\n      \"DataEKrijimit\": \"{{$isoTimestamp}}\",\n      \"DataEModifikimit\": \"{{$isoTimestamp}}\",\n      \"Fshire\": 0,\n      \"FaturaId\": 1001,\n      \"ProduktiId\": 1001,\n      \"Cmimi\": 10.50,\n      \"Sasia\": 2.0,\n      \"Rabati\": 0.00,\n      \"IdTavolina\": \"T1\",\n      \"Aktive\": 1,\n      \"ShfrytezuesiId\": 1,\n      \"Tvsh\": 1.89\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/sync/v1/batch",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sync",
+								"v1",
+								"batch"
+							]
+						},
+						"description": "Sync Porosia (Orders) table data"
+					},
+					"response": []
+				},
+				{
+					"name": "12. Batch Sync - Blerjet",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
+							},
+							{
+								"key": "X-Tenant-External-Key",
+								"value": "{{tenant_key}}",
+								"type": "text"
+							},
+							{
+								"key": "X-Idempotency-Key",
+								"value": "{{$timestamp}}-blerjet-{{$randomInt}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"table\": \"Blerjet\",\n  \"fromVersion\": 1000,\n  \"toVersion\": 1001,\n  \"rows\": [\n    {\n      \"Id\": 1001,\n      \"op\": \"upsert\",\n      \"DataEFatures\": \"{{$isoTimestamp}}\",\n      \"DataEKrijimit\": \"{{$isoTimestamp}}\",\n      \"DataEModifikimit\": \"{{$isoTimestamp}}\",\n      \"Fshire\": 0,\n      \"NrFatures\": \"BL-2025-001\",\n      \"AfatiPageses\": \"2025-10-16T00:00:00.000Z\",\n      \"BlerjeKategoriaId\": 1,\n      \"NumriFaturesSeFurnitorit\": \"SUP-001\",\n      \"Fatura\": null,\n      \"Staff\": 0,\n      \"SubjektiId\": 1001,\n      \"PagesaId\": 1001,\n      \"StatusFatureId\": 1,\n      \"OptimisticLockField\": 1,\n      \"fTotalPorosias\": 100.00,\n      \"fTotalVAT\": 18.00,\n      \"TotalPorosias\": 100.00,\n      \"TotalVAT\": 18.00,\n      \"ArkaId\": 1,\n      \"MenyraPagesesId\": 1\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/sync/v1/batch",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sync",
+								"v1",
+								"batch"
+							]
+						},
+						"description": "Sync Blerjet (Purchases) table data"
+					},
+					"response": []
+				},
+				{
+					"name": "13. Batch Sync - PorositeEBlerjes",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
+							},
+							{
+								"key": "X-Tenant-External-Key",
+								"value": "{{tenant_key}}",
+								"type": "text"
+							},
+							{
+								"key": "X-Idempotency-Key",
+								"value": "{{$timestamp}}-porositeeblerjes-{{$randomInt}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"table\": \"PorositeEBlerjes\",\n  \"fromVersion\": 1000,\n  \"toVersion\": 1001,\n  \"rows\": [\n    {\n      \"Id\": 1001,\n      \"op\": \"upsert\",\n      \"ProduktiId\": 1001,\n      \"Sasia\": 5.0,\n      \"CmimiNjesi\": 20.00,\n      \"DataEKrijimit\": \"{{$isoTimestamp}}\",\n      \"DataEModifikimit\": \"{{$isoTimestamp}}\",\n      \"Fshire\": 0,\n      \"BlerjaId\": 1001,\n      \"PorosiaDate\": \"{{$isoTimestamp}}\",\n      \"Tvsh\": 18.00,\n      \"Rabati\": 0.00,\n      \"Total\": 100.00\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/sync/v1/batch",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sync",
+								"v1",
+								"batch"
+							]
+						},
+						"description": "Sync PorositeEBlerjes (Purchase Orders) table data"
+					},
+					"response": []
+				},
+				{
+					"name": "14. Batch Sync - Stoku",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
+							},
+							{
+								"key": "X-Tenant-External-Key",
+								"value": "{{tenant_key}}",
+								"type": "text"
+							},
+							{
+								"key": "X-Idempotency-Key",
+								"value": "{{$timestamp}}-stoku-{{$randomInt}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"table\": \"Stoku\",\n  \"fromVersion\": 1000,\n  \"toVersion\": 1001,\n  \"rows\": [\n    {\n      \"Id\": 1001,\n      \"op\": \"upsert\",\n      \"ProduktiId\": 1001,\n      \"Sasia\": 50.0,\n      \"LevelIRenditjes\": 10,\n      \"DataEKrijimit\": \"{{$isoTimestamp}}\",\n      \"DataEModifikimit\": \"{{$isoTimestamp}}\",\n      \"Fshire\": 0,\n      \"Lokacioni\": \"A-1-01\"\n    },\n    {\n      \"Id\": 1002,\n      \"op\": \"upsert\",\n      \"ProduktiId\": 1001,\n      \"Sasia\": 25.0,\n      \"LevelIRenditjes\": 5,\n      \"DataEKrijimit\": \"{{$isoTimestamp}}\",\n      \"DataEModifikimit\": \"{{$isoTimestamp}}\",\n      \"Fshire\": 0,\n      \"Lokacioni\": \"A-1-02\"\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/sync/v1/batch",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sync",
+								"v1",
+								"batch"
+							]
+						},
+						"description": "Sync Stoku (Stock) table data"
+					},
+					"response": []
+				},
+				{
+					"name": "15. Batch Sync - Normativa",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
+							},
+							{
+								"key": "X-Tenant-External-Key",
+								"value": "{{tenant_key}}",
+								"type": "text"
+							},
+							{
+								"key": "X-Idempotency-Key",
+								"value": "{{$timestamp}}-normativa-{{$randomInt}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"table\": \"Normativa\",\n  \"fromVersion\": 1000,\n  \"toVersion\": 1001,\n  \"rows\": [\n    {\n      \"Id\": 1001,\n      \"op\": \"upsert\",\n      \"ArtikulliBazeId\": 1001,\n      \"Norma\": 10.0,\n      \"DataEKrijimit\": \"{{$isoTimestamp}}\",\n      \"DataEModifikimit\": \"{{$isoTimestamp}}\"\n    },\n    {\n      \"Id\": 1002,\n      \"op\": \"upsert\",\n      \"ArtikulliBazeId\": 1001,\n      \"Norma\": 15.0,\n      \"DataEKrijimit\": \"{{$isoTimestamp}}\",\n      \"DataEModifikimit\": \"{{$isoTimestamp}}\"\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/sync/v1/batch",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sync",
+								"v1",
+								"batch"
+							]
+						},
+						"description": "Sync Normativa (Standards) table data"
+					},
+					"response": []
+				},
+				{
+					"name": "16. Batch Sync - ZRaportet",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
+							},
+							{
+								"key": "X-Tenant-External-Key",
+								"value": "{{tenant_key}}",
+								"type": "text"
+							},
+							{
+								"key": "X-Idempotency-Key",
+								"value": "{{$timestamp}}-zraportet-{{$randomInt}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"table\": \"ZRaportet\",\n  \"fromVersion\": 1000,\n  \"toVersion\": 1001,\n  \"rows\": [\n    {\n      \"Id\": 1001,\n      \"op\": \"upsert\",\n      \"DataEKrijimit\": \"{{$isoTimestamp}}\",\n      \"DataEModifikimit\": \"{{$isoTimestamp}}\",\n      \"ShumaShitjeProgram\": 1000.00,\n      \"ShumaNeZRaport\": 1000.00\n    },\n    {\n      \"Id\": 1002,\n      \"op\": \"upsert\",\n      \"DataEKrijimit\": \"{{$isoTimestamp}}\",\n      \"DataEModifikimit\": \"{{$isoTimestamp}}\",\n      \"ShumaShitjeProgram\": 2000.00,\n      \"ShumaNeZRaport\": 2000.00\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/sync/v1/batch",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sync",
+								"v1",
+								"batch"
+							]
+						},
+						"description": "Sync ZRaportet (Z Reports) table data"
+					},
+					"response": []
+				},
+				{
+					"name": "17. Batch Delete Test",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
+							},
+							{
+								"key": "X-Tenant-External-Key",
+								"value": "{{tenant_key}}",
+								"type": "text"
+							},
+							{
+								"key": "X-Idempotency-Key",
+								"value": "{{$timestamp}}-delete-{{$randomInt}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"table\": \"Subjektet\",\n  \"fromVersion\": 1001,\n  \"toVersion\": 1002,\n  \"rows\": [\n    {\n      \"Id\": 1001,\n      \"op\": \"delete\"\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/sync/v1/batch",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sync",
+								"v1",
+								"batch"
+							]
+						},
+						"description": "Test delete operation"
+					},
+					"response": []
+				}
+			],
+			"description": "Data synchronization endpoints for all supported tables"
+		},
+		{
+			"name": "Complete Data Flow",
+			"item": [
+				{
+					"name": "Run All Tables in Order",
+					"item": [
+						{
+							"name": "Step 1: Foundation Tables",
+							"item": [
+								{
+									"name": "1.1 Subjektet",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer {{jwt_token}}",
+												"type": "text"
+											},
+											{
+												"key": "X-Tenant-External-Key",
+												"value": "{{tenant_key}}",
+												"type": "text"
+											},
+											{
+												"key": "X-Idempotency-Key",
+												"value": "{{$timestamp}}-flow-subjektet-{{$randomInt}}",
+												"type": "text"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"table\": \"Subjektet\",\n  \"fromVersion\": 1000,\n  \"toVersion\": 1001,\n  \"rows\": [\n    {\n      \"Id\": 1001,\n      \"op\": \"upsert\",\n      \"Kodi\": \"FLOW-SUB-001\",\n      \"Emertimi\": \"Flow Test Subject\",\n      \"Furnitor\": 0,\n      \"Bleres\": 1,\n      \"Fshire\": 0,\n      \"DataEKrijimit\": \"{{$isoTimestamp}}\",\n      \"DataEModifikimit\": \"{{$isoTimestamp}}\"\n    }\n  ]\n}"
+										},
+										"url": {
+											"raw": "{{base_url}}/sync/v1/batch",
+											"host": ["{{base_url}}"],
+											"path": ["sync", "v1", "batch"]
+										}
+									}
+								},
+								{
+									"name": "1.2 TVSH",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer {{jwt_token}}",
+												"type": "text"
+											},
+											{
+												"key": "X-Tenant-External-Key",
+												"value": "{{tenant_key}}",
+												"type": "text"
+											},
+											{
+												"key": "X-Idempotency-Key",
+												"value": "{{$timestamp}}-flow-tvsh-{{$randomInt}}",
+												"type": "text"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"table\": \"TVSH\",\n  \"fromVersion\": 1000,\n  \"toVersion\": 1001,\n  \"rows\": [\n    {\n      \"Id\": 1,\n      \"op\": \"upsert\",\n      \"Perqindja\": 20.00,\n      \"Grupi\": \"Standard\",\n      \"Fshire\": 0,\n      \"DataEKrijimit\": \"{{$isoTimestamp}}\",\n      \"DataEModifikimit\": \"{{$isoTimestamp}}\"\n    }\n  ]\n}"
+										},
+										"url": {
+											"raw": "{{base_url}}/sync/v1/batch",
+											"host": ["{{base_url}}"],
+											"path": ["sync", "v1", "batch"]
+										}
+									}
+								},
+								{
+									"name": "1.3 Kategoria",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer {{jwt_token}}",
+												"type": "text"
+											},
+											{
+												"key": "X-Tenant-External-Key",
+												"value": "{{tenant_key}}",
+												"type": "text"
+											},
+											{
+												"key": "X-Idempotency-Key",
+												"value": "{{$timestamp}}-flow-kategoria-{{$randomInt}}",
+												"type": "text"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"table\": \"Kategoria\",\n  \"fromVersion\": 1000,\n  \"toVersion\": 1001,\n  \"rows\": [\n    {\n      \"Id\": 1,\n      \"op\": \"upsert\",\n      \"Emri\": \"Flow Test Category\",\n      \"Color\": \"#FF0000\",\n      \"Printer\": \"Default\",\n      \"Lloji\": 1,\n      \"EmriNePrinter\": \"FLOW\",\n      \"DataEKrijimit\": \"{{$isoTimestamp}}\",\n      \"DataEModifikimit\": \"{{$isoTimestamp}}\"\n    }\n  ]\n}"
+										},
+										"url": {
+											"raw": "{{base_url}}/sync/v1/batch",
+											"host": ["{{base_url}}"],
+											"path": ["sync", "v1", "batch"]
+										}
+									}
+								}
+							]
+						},
+						{
+							"name": "Step 2: Products & Users",
+							"item": [
+								{
+									"name": "2.1 ArtikulliBaze",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer {{jwt_token}}",
+												"type": "text"
+											},
+											{
+												"key": "X-Tenant-External-Key",
+												"value": "{{tenant_key}}",
+												"type": "text"
+											},
+											{
+												"key": "X-Idempotency-Key",
+												"value": "{{$timestamp}}-flow-artikullibaze-{{$randomInt}}",
+												"type": "text"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"table\": \"ArtikulliBaze\",\n  \"fromVersion\": 1000,\n  \"toVersion\": 1001,\n  \"rows\": [\n    {\n      \"Id\": 1001,\n      \"op\": \"upsert\",\n      \"Artikull\": 1,\n      \"Sherbim\": 0,\n      \"Shifra\": \"FLOW-ART-001\",\n      \"Emri\": \"Flow Test Product\",\n      \"Njesia\": \"Cope\",\n      \"KategoriaId\": 1,\n      \"TvshId\": 1,\n      \"Aktiv\": 1,\n      \"Fshire\": 0,\n      \"DataEKrijimit\": \"{{$isoTimestamp}}\",\n      \"DataEModifikimit\": \"{{$isoTimestamp}}\"\n    }\n  ]\n}"
+										},
+										"url": {
+											"raw": "{{base_url}}/sync/v1/batch",
+											"host": ["{{base_url}}"],
+											"path": ["sync", "v1", "batch"]
+										}
+									}
+								},
+								{
+									"name": "2.2 Shfrytezuesi",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer {{jwt_token}}",
+												"type": "text"
+											},
+											{
+												"key": "X-Tenant-External-Key",
+												"value": "{{tenant_key}}",
+												"type": "text"
+											},
+											{
+												"key": "X-Idempotency-Key",
+												"value": "{{$timestamp}}-flow-shfrytezuesi-{{$randomInt}}",
+												"type": "text"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"table\": \"Shfrytezuesi\",\n  \"fromVersion\": 1000,\n  \"toVersion\": 1001,\n  \"rows\": [\n    {\n      \"Id\": 1,\n      \"op\": \"upsert\",\n      \"Username\": \"flowuser\",\n      \"Email\": \"flow@kendrix.com\",\n      \"Tel\": \"+1234567890\",\n      \"Aktiv\": 1,\n      \"Fshire\": 0,\n      \"DataEKrijimit\": \"{{$isoTimestamp}}\",\n      \"DataEModifikimit\": \"{{$isoTimestamp}}\"\n    }\n  ]\n}"
+										},
+										"url": {
+											"raw": "{{base_url}}/sync/v1/batch",
+											"host": ["{{base_url}}"],
+											"path": ["sync", "v1", "batch"]
+										}
+									}
+								}
+							]
+						},
+						{
+							"name": "Step 3: Categories & Payment Methods",
+							"item": [
+								{
+									"name": "3.1 FaturaKategoria",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer {{jwt_token}}",
+												"type": "text"
+											},
+											{
+												"key": "X-Tenant-External-Key",
+												"value": "{{tenant_key}}",
+												"type": "text"
+											},
+											{
+												"key": "X-Idempotency-Key",
+												"value": "{{$timestamp}}-flow-faturakategoria-{{$randomInt}}",
+												"type": "text"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"table\": \"FaturaKategoria\",\n  \"fromVersion\": 1000,\n  \"toVersion\": 1001,\n  \"rows\": [\n    {\n      \"Id\": 1,\n      \"op\": \"upsert\",\n      \"Emri\": \"Flow Invoice Category\",\n      \"Kodi\": \"FLOW-INV\",\n      \"Pershkrimi\": \"Flow test invoice category\",\n      \"TvshId\": 1,\n      \"Fshire\": 0,\n      \"DataEKrijimit\": \"{{$isoTimestamp}}\",\n      \"DataEModifikimit\": \"{{$isoTimestamp}}\"\n    }\n  ]\n}"
+										},
+										"url": {
+											"raw": "{{base_url}}/sync/v1/batch",
+											"host": ["{{base_url}}"],
+											"path": ["sync", "v1", "batch"]
+										}
+									}
+								},
+								{
+									"name": "3.2 MenyraPageses",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer {{jwt_token}}",
+												"type": "text"
+											},
+											{
+												"key": "X-Tenant-External-Key",
+												"value": "{{tenant_key}}",
+												"type": "text"
+											},
+											{
+												"key": "X-Idempotency-Key",
+												"value": "{{$timestamp}}-flow-menyrapageses-{{$randomInt}}",
+												"type": "text"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"table\": \"MenyraPageses\",\n  \"fromVersion\": 1000,\n  \"toVersion\": 1001,\n  \"rows\": [\n    {\n      \"Id\": 1,\n      \"op\": \"upsert\",\n      \"Kodi\": \"FLOW-CASH\",\n      \"Emertimi\": \"Flow Cash Payment\",\n      \"Kontoja\": 1001,\n      \"FiskalType\": 1,\n      \"PosEnabled\": 1,\n      \"DataEKrijimit\": \"{{$isoTimestamp}}\",\n      \"DataEModifikimit\": \"{{$isoTimestamp}}\"\n    }\n  ]\n}"
+										},
+										"url": {
+											"raw": "{{base_url}}/sync/v1/batch",
+											"host": ["{{base_url}}"],
+											"path": ["sync", "v1", "batch"]
+										}
+									}
+								}
+							]
+						},
+						{
+							"name": "Step 4: Payments",
+							"item": [
+								{
+									"name": "4.1 Pagesat",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer {{jwt_token}}",
+												"type": "text"
+											},
+											{
+												"key": "X-Tenant-External-Key",
+												"value": "{{tenant_key}}",
+												"type": "text"
+											},
+											{
+												"key": "X-Idempotency-Key",
+												"value": "{{$timestamp}}-flow-pagesat-{{$randomInt}}",
+												"type": "text"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"table\": \"Pagesat\",\n  \"fromVersion\": 1000,\n  \"toVersion\": 1001,\n  \"rows\": [\n    {\n      \"Id\": 1001,\n      \"op\": \"upsert\",\n      \"DataPageses\": \"{{$isoTimestamp}}\",\n      \"MenyraPagesesId\": 1,\n      \"Totali\": 100.00,\n      \"ShumaPaguar\": 100.00,\n      \"DataEModifikimit\": \"{{$isoTimestamp}}\"\n    }\n  ]\n}"
+										},
+										"url": {
+											"raw": "{{base_url}}/sync/v1/batch",
+											"host": ["{{base_url}}"],
+											"path": ["sync", "v1", "batch"]
+										}
+									}
+								}
+							]
+						},
+						{
+							"name": "Step 5: Invoices & Orders",
+							"item": [
+								{
+									"name": "5.1 Fatura",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer {{jwt_token}}",
+												"type": "text"
+											},
+											{
+												"key": "X-Tenant-External-Key",
+												"value": "{{tenant_key}}",
+												"type": "text"
+											},
+											{
+												"key": "X-Idempotency-Key",
+												"value": "{{$timestamp}}-flow-fatura-{{$randomInt}}",
+												"type": "text"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"table\": \"Fatura\",\n  \"fromVersion\": 1000,\n  \"toVersion\": 1001,\n  \"rows\": [\n    {\n      \"Id\": 1001,\n      \"op\": \"upsert\",\n      \"Data\": \"{{$isoTimestamp}}\",\n      \"Fshire\": 0,\n      \"ShfrytezuesiId\": 1,\n      \"NrFatures\": \"FLOW-2025-001\",\n      \"AfatiPageses\": \"2025-10-16\",\n      \"Staff\": 0,\n      \"FaturaKategoriaId\": 1,\n      \"DataEKrijimit\": \"{{$isoTimestamp}}\",\n      \"DataEModifikimit\": \"{{$isoTimestamp}}\",\n      \"KodiValues\": \"EUR\",\n      \"KursiKembimit\": 1.0000,\n      \"SubjektiId\": 1001,\n      \"StatusFatureId\": 1,\n      \"PagesaId\": 1001,\n      \"Comment\": \"Flow test invoice\"\n    }\n  ]\n}"
+										},
+										"url": {
+											"raw": "{{base_url}}/sync/v1/batch",
+											"host": ["{{base_url}}"],
+											"path": ["sync", "v1", "batch"]
+										}
+									}
+								},
+								{
+									"name": "5.2 Porosia",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer {{jwt_token}}",
+												"type": "text"
+											},
+											{
+												"key": "X-Tenant-External-Key",
+												"value": "{{tenant_key}}",
+												"type": "text"
+											},
+											{
+												"key": "X-Idempotency-Key",
+												"value": "{{$timestamp}}-flow-porosia-{{$randomInt}}",
+												"type": "text"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"table\": \"Porosia\",\n  \"fromVersion\": 1000,\n  \"toVersion\": 1001,\n  \"rows\": [\n    {\n      \"Id\": 1001,\n      \"op\": \"upsert\",\n      \"DataEKrijimit\": \"{{$isoTimestamp}}\",\n      \"DataEModifikimit\": \"{{$isoTimestamp}}\",\n      \"Fshire\": 0,\n      \"FaturaId\": 1001,\n      \"ProduktiId\": 1001,\n      \"Cmimi\": 10.50,\n      \"Sasia\": 2.0,\n      \"Rabati\": 0.00,\n      \"IdTavolina\": \"T1\",\n      \"Aktive\": 1,\n      \"ShfrytezuesiId\": 1,\n      \"Tvsh\": 1.89\n    }\n  ]\n}"
+										},
+										"url": {
+											"raw": "{{base_url}}/sync/v1/batch",
+											"host": ["{{base_url}}"],
+											"path": ["sync", "v1", "batch"]
+										}
+									}
+								}
+							]
+						}
+					]
+				}
+			],
+			"description": "Complete data flow testing with proper dependency order"
+		},
+		{
+			"name": "Seeding",
+			"item": [
+				{
+					"name": "Seed Subjektet",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
+							},
+							{
+								"key": "X-Tenant-External-Key",
+								"value": "{{tenant_key}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[\n  {\n    \"Id\": 2001,\n    \"Kodi\": \"SEED-SUB-001\",\n    \"Emertimi\": \"Seeded Subject 1\",\n    \"Furnitor\": 0,\n    \"Bleres\": 1,\n    \"NrUnik\": \"SEED001\",\n    \"NoFiskal\": \"SEED-FISKAL-001\",\n    \"NoTVSH\": \"SEED-TVSH-001\",\n    \"NIB\": \"SEED-NIB-001\",\n    \"Adresa\": \"Seeded Address 1\",\n    \"Telefoni\": \"+1111111111\",\n    \"Email\": \"seed1@example.com\",\n    \"Rabati\": 0.00,\n    \"Pershkrimi\": \"Seeded subject for testing\",\n    \"Fshire\": 0,\n    \"DataEKrijimit\": \"{{$isoTimestamp}}\",\n    \"DataEModifikimit\": \"{{$isoTimestamp}}\"\n  },\n  {\n    \"Id\": 2002,\n    \"Kodi\": \"SEED-SUB-002\",\n    \"Emertimi\": \"Seeded Subject 2\",\n    \"Furnitor\": 1,\n    \"Bleres\": 0,\n    \"NrUnik\": \"SEED002\",\n    \"NoFiskal\": \"SEED-FISKAL-002\",\n    \"NoTVSH\": \"SEED-TVSH-002\",\n    \"NIB\": \"SEED-NIB-002\",\n    \"Adresa\": \"Seeded Address 2\",\n    \"Telefoni\": \"+2222222222\",\n    \"Email\": \"seed2@example.com\",\n    \"Rabati\": 5.00,\n    \"Pershkrimi\": \"Seeded supplier for testing\",\n    \"Fshire\": 0,\n    \"DataEKrijimit\": \"{{$isoTimestamp}}\",\n    \"DataEModifikimit\": \"{{$isoTimestamp}}\"\n  }\n]"
+						},
+						"url": {
+							"raw": "{{base_url}}/sync/v1/seed/Subjektet",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sync",
+								"v1",
+								"seed",
+								"Subjektet"
+							]
+						},
+						"description": "Seed Subjektet table with initial data"
+					},
+					"response": []
+				},
+				{
+					"name": "Seed ArtikulliBaze",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
+							},
+							{
+								"key": "X-Tenant-External-Key",
+								"value": "{{tenant_key}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[\n  {\n    \"Id\": 2001,\n    \"Artikull\": 1,\n    \"Sherbim\": 0,\n    \"Shifra\": \"SEED-ART-001\",\n    \"Emri\": \"Seeded Product 1\",\n    \"Njesia\": \"Cope\",\n    \"Barkodi\": \"SEED123456789\",\n    \"Cmimi_I_Shitjes_Cope\": 15.00,\n    \"Cmimi_I_Shitjes_Pako\": 150.00,\n    \"SasiaPako\": 10,\n    \"KategoriaId\": 1,\n    \"Aktiv\": 1,\n    \"ArtikullIPerbere\": 0,\n    \"EmriGjenerik\": \"Seeded Generic Name\",\n    \"Prodhuesi\": \"Seeded Producer\",\n    \"ArtNgaPeshorja\": 0,\n    \"DataEKrijimit\": \"{{$isoTimestamp}}\",\n    \"DataEModifikimit\": \"{{$isoTimestamp}}\",\n    \"TvshId\": 1,\n    \"EmertimiiDyte\": \"Seeded Alternative Name\",\n    \"PeshaNeto\": 1.0,\n    \"PeshaBruto\": 1.2,\n    \"Gjatesia\": 20.0,\n    \"Gjersia\": 10.0,\n    \"Lartesia\": 5.0,\n    \"SasiaMinimale\": 1.0,\n    \"SasiaMaksimale\": 50.0,\n    \"Afatshkurte\": 0,\n    \"Afatgjate\": 0,\n    \"NormaZhvleresimit\": 5.00,\n    \"DataEFillimitTeZhvlersimit\": \"2025-01-01\",\n    \"Skadimi\": \"2026-12-31\",\n    \"Ambalazhi\": \"Seeded Box\",\n    \"IRimbursueshem\": 1,\n    \"OrigjinaEMallit\": \"Seeded Origin\",\n    \"KostoEProdhimit\": 8,\n    \"Rafti\": \"SEED-A1\",\n    \"KodiDoganor\": \"SEED-CUSTOMS-001\",\n    \"SubjektiId\": 2001,\n    \"IncomeAccountId\": 2001,\n    \"ExpenseAccountId\": 3001,\n    \"IsGroup\": 0,\n    \"GroupId\": null\n  }\n]"
+						},
+						"url": {
+							"raw": "{{base_url}}/sync/v1/seed/ArtikulliBaze",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sync",
+								"v1",
+								"seed",
+								"ArtikulliBaze"
+							]
+						},
+						"description": "Seed ArtikulliBaze table with initial data"
+					},
+					"response": []
+				}
+			],
+			"description": "Data seeding endpoints for initial data load"
+		},
+		{
+			"name": "Error Testing",
+			"item": [
+				{
+					"name": "Invalid Table",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
+							},
+							{
+								"key": "X-Tenant-External-Key",
+								"value": "{{tenant_key}}",
+								"type": "text"
+							},
+							{
+								"key": "X-Idempotency-Key",
+								"value": "{{$timestamp}}-invalid-{{$randomInt}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"table\": \"InvalidTable\",\n  \"fromVersion\": 1000,\n  \"toVersion\": 1001,\n  \"rows\": []\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/sync/v1/batch",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sync",
+								"v1",
+								"batch"
+							]
+						},
+						"description": "Test error handling with invalid table name"
+					},
+					"response": []
+				},
+				{
+					"name": "Missing Headers",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"table\": \"Subjektet\",\n  \"fromVersion\": 1000,\n  \"toVersion\": 1001,\n  \"rows\": []\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/sync/v1/batch",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sync",
+								"v1",
+								"batch"
+							]
+						},
+						"description": "Test error handling with missing authentication headers"
+					},
+					"response": []
+				},
+				{
+					"name": "Invalid JSON",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
+							},
+							{
+								"key": "X-Tenant-External-Key",
+								"value": "{{tenant_key}}",
+								"type": "text"
+							},
+							{
+								"key": "X-Idempotency-Key",
+								"value": "{{$timestamp}}-invalid-json-{{$randomInt}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"table\": \"Subjektet\",\n  \"fromVersion\": 1000,\n  \"toVersion\": 1001,\n  \"rows\": [\n    {\n      \"Id\": 1001,\n      \"op\": \"upsert\",\n      \"Kodi\": \"TEST-001\",\n      \"Emertimi\": \"Test Subject\",\n      // Invalid JSON comment\n      \"Furnitor\": 0,\n      \"Bleres\": 1\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/sync/v1/batch",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sync",
+								"v1",
+								"batch"
+							]
+						},
+						"description": "Test error handling with invalid JSON"
+					},
+					"response": []
+				},
+				{
+					"name": "Invalid Tenant",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
+							},
+							{
+								"key": "X-Tenant-External-Key",
+								"value": "INVALID-TENANT-KEY",
+								"type": "text"
+							},
+							{
+								"key": "X-Idempotency-Key",
+								"value": "{{$timestamp}}-invalid-tenant-{{$randomInt}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"table\": \"Subjektet\",\n  \"fromVersion\": 1000,\n  \"toVersion\": 1001,\n  \"rows\": []\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/sync/v1/batch",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sync",
+								"v1",
+								"batch"
+							]
+						},
+						"description": "Test error handling with invalid tenant key"
+					},
+					"response": []
+				}
+			],
+			"description": "Error testing endpoints to verify proper error handling"
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Auto-generate JWT token if not set",
+					"if (!pm.environment.get('jwt_token')) {",
+					"    // You can call the generate_token.php endpoint here",
+					"    // or set it manually in the environment",
+					"    console.log('Please run the Generate JWT Token request first');",
+					"}"
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "https://client.kendrix.org/api",
+			"type": "string"
+		},
+		{
+			"key": "jwt_token",
+			"value": "",
+			"type": "string",
+			"description": "JWT token for authentication. Run Generate JWT Token request to get this."
+		},
+		{
+			"key": "tenant_key",
+			"value": "KENDRIX-CLIENT-001",
+			"type": "string",
+			"description": "Tenant external key for multi-tenant support"
+		}
+	]
+}

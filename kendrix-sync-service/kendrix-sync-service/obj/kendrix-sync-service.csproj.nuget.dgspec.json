@@ -1,0 +1,70 @@
+{
+  "format": 1,
+  "restore": {
+    "C:\\Users\\qendr\\OneDrive\\Desktop\\Personal\\Personal-projects\\kendrix-client\\kendrix-sync-service\\kendrix-sync-service\\kendrix-sync-service.csproj": {}
+  },
+  "projects": {
+    "C:\\Users\\qendr\\OneDrive\\Desktop\\Personal\\Personal-projects\\kendrix-client\\kendrix-sync-service\\kendrix-sync-service\\kendrix-sync-service.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\qendr\\OneDrive\\Desktop\\Personal\\Personal-projects\\kendrix-client\\kendrix-sync-service\\kendrix-sync-service\\kendrix-sync-service.csproj",
+        "projectName": "kendrix-sync-service",
+        "projectPath": "C:\\Users\\qendr\\OneDrive\\Desktop\\Personal\\Personal-projects\\kendrix-client\\kendrix-sync-service\\kendrix-sync-service\\kendrix-sync-service.csproj",
+        "packagesPath": "C:\\Users\\qendr\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\qendr\\OneDrive\\Desktop\\Personal\\Personal-projects\\kendrix-client\\kendrix-sync-service\\kendrix-sync-service\\obj\\",
+        "projectStyle": "PackageReference",
+        "skipContentFileWrite": true,
+        "fallbackFolders": [
+          "C:\\Program Files\\DevExpress 22.2\\Components\\Offline Packages"
+        ],
+        "configFilePaths": [
+          "C:\\Users\\qendr\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\DevExpress 22.2.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net472"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\DevExpress 22.2\\Components\\System\\Components\\Packages": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net472": {
+            "projectReferences": {}
+          }
+        }
+      },
+      "frameworks": {
+        "net472": {
+          "dependencies": {
+            "Microsoft.IdentityModel.Tokens": {
+              "target": "Package",
+              "version": "[6.25.1, )"
+            },
+            "Newtonsoft.Json": {
+              "target": "Package",
+              "version": "[13.0.3, )"
+            },
+            "System.IdentityModel.Tokens.Jwt": {
+              "target": "Package",
+              "version": "[6.25.1, )"
+            }
+          }
+        }
+      },
+      "runtimes": {
+        "win": {
+          "#import": []
+        },
+        "win-x64": {
+          "#import": []
+        },
+        "win-x86": {
+          "#import": []
+        }
+      }
+    }
+  }
+}
