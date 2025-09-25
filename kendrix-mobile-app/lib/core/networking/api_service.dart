@@ -3,6 +3,8 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../auth/auth_state.dart';
 import '../auth/token_storage.dart';
+import '../../features/auth/models/login_response.dart';
+import '../../features/auth/models/user.dart';
 
 class ApiService {
   static const String _baseUrl = 'https://client.kendrix.org';
@@ -12,7 +14,7 @@ class ApiService {
   static ApiService get instance => _instance ??= ApiService._();
   
   final TokenStorage _tokenStorage = TokenStorage();
-  
+
   ApiService._();
 
   Future<Map<String, String>> _getHeaders() async {
@@ -33,6 +35,14 @@ class ApiService {
   Future<String?> _getTenantKey() async {
     final tenantKey = await _tokenStorage.getTenantKey();
     print('🔐 Retrieved tenant key: $tenantKey');
+    
+    // Return the actual tenant key from storage (no hardcoded fallback)
+    // The tenant key should be provided during login
+    if (tenantKey == null || tenantKey.isEmpty) {
+      print('⚠️  No tenant key found in storage. User needs to login with tenant key.');
+      return null;
+    }
+    
     return tenantKey;
   }
 
@@ -41,7 +51,7 @@ class ApiService {
     String endpoint, {
     Map<String, dynamic>? body,
     Map<String, String>? queryParams,
-    T Function(Map<String, dynamic>)? fromJson,
+    T Function(dynamic)? fromJson,
   }) async {
     try {
       final headers = await _getHeaders();
@@ -95,26 +105,82 @@ class ApiService {
       print('🌐 HTTP response status: ${response.statusCode}');
       print('🌐 HTTP response body: ${response.body}');
 
-      final responseData = jsonDecode(response.body) as Map<String, dynamic>;
+      final responseJson = jsonDecode(response.body);
+      print('🌐 Response JSON type: ${responseJson.runtimeType}');
       
       if (response.statusCode >= 200 && response.statusCode < 300) {
-        if (fromJson != null && responseData['data'] != null) {
-          return ApiResponse<T>.success(
-            fromJson(responseData['data']),
-            response.statusCode,
-          );
+        if (responseJson is Map<String, dynamic>) {
+          // Response is a Map (object)
+          final responseData = responseJson;
+          
+          // Check if there's a 'success' field indicating this is a response wrapper
+          if (responseData.containsKey('success') && responseData['success'] == true && responseData.containsKey('data')) {
+            // Wrapped response format
+            if (fromJson != null && responseData['data'] != null) {
+              return ApiResponse<T>.success(
+                fromJson(responseData['data']),
+                response.statusCode,
+              );
+            } else {
+              return ApiResponse<T>.success(
+                responseData['data'] as T,
+                response.statusCode,
+              );
+            }
+          } else {
+            // Direct object response (for mobile endpoints)
+            if (fromJson != null) {
+              return ApiResponse<T>.success(
+                fromJson(responseData),
+                response.statusCode,
+              );
+            } else {
+              return ApiResponse<T>.success(
+                responseData as T,
+                response.statusCode,
+              );
+            }
+          }
+        } else if (responseJson is List) {
+          // Response is a direct array
+          print('🌐 Direct array response detected');
+          if (fromJson != null) {
+            // For direct arrays, pass the array directly to fromJson
+            // The _parseListData function knows how to handle List<dynamic>
+            return ApiResponse<T>.success(
+              fromJson(responseJson),
+              response.statusCode,
+            );
+          } else {
+            return ApiResponse<T>.success(
+              responseJson as T,
+              response.statusCode,
+            );
+          }
         } else {
-          return ApiResponse<T>.success(
-            responseData as T,
+          // Unexpected response format
+          return ApiResponse<T>.error(
+            'Unexpected response format: ${responseJson.runtimeType}',
             response.statusCode,
+            'Expected Map or List, got ${responseJson.runtimeType}',
           );
         }
       } else {
-        return ApiResponse<T>.error(
-          responseData['error'] ?? 'Unknown error',
-          response.statusCode,
-          responseData['details'],
-        );
+        // Handle error responses
+        if (responseJson is Map<String, dynamic>) {
+          final responseData = responseJson;
+          return ApiResponse<T>.error(
+            responseData['error'] ?? 'Unknown error',
+            response.statusCode,
+            responseData['details'],
+          );
+        } else {
+          return ApiResponse<T>.error(
+            'HTTP Error ${response.statusCode}',
+            response.statusCode,
+            response.body,
+          );
+        }
       }
     } catch (e) {
       return ApiResponse<T>.error(
@@ -161,6 +227,171 @@ class ApiService {
     );
   }
 
+  // Table-specific endpoints
+  Future<ApiResponse<List<Map<String, dynamic>>>> getFatura() async {
+    print('🌐 getFatura called');
+    return _makeRequest<List<Map<String, dynamic>>>(
+      'GET',
+      '/fatura',
+      fromJson: (data) => _parseListData(data),
+    );
+  }
+
+  Future<ApiResponse<List<Map<String, dynamic>>>> getBlerjet() async {
+    print('🌐 getBlerjet called');
+    return _makeRequest<List<Map<String, dynamic>>>(
+      'GET',
+      '/blerjet',
+      fromJson: (data) => _parseListData(data),
+    );
+  }
+
+  Future<ApiResponse<List<Map<String, dynamic>>>> getStoku() async {
+    print('🌐 getStoku called');
+    return _makeRequest<List<Map<String, dynamic>>>(
+      'GET',
+      '/stoku',
+      fromJson: (data) => _parseListData(data),
+    );
+  }
+
+  Future<ApiResponse<List<Map<String, dynamic>>>> getSubjektet() async {
+    print('🌐 getSubjektet called');
+    return _makeRequest<List<Map<String, dynamic>>>(
+      'GET',
+      '/subjektet',
+      fromJson: (data) => _parseListData(data),
+    );
+  }
+
+  // Helper method to parse list data
+  List<Map<String, dynamic>> _parseListData(dynamic data) {
+    if (data is List) {
+      return List<Map<String, dynamic>>.from(data);
+    } else if (data is Map && data.containsKey('data')) {
+      return List<Map<String, dynamic>>.from(data['data'] as List);
+    } else {
+      return <Map<String, dynamic>>[];
+    }
+  }
+
+  Future<ApiResponse<List<Map<String, dynamic>>>> getArtikulliBaze() async {
+    print('🌐 getArtikulliBaze called');
+    return _makeRequest<List<Map<String, dynamic>>>(
+      'GET',
+      '/artikulli',
+      fromJson: (data) => _parseListData(data),
+    );
+  }
+
+  Future<ApiResponse<List<Map<String, dynamic>>>> getFaturaKategoria() async {
+    print('🌐 getFaturaKategoria called');
+    return _makeRequest<List<Map<String, dynamic>>>(
+      'GET',
+      '/fatura-kategoria',
+      fromJson: (data) => _parseListData(data),
+    );
+  }
+
+  Future<ApiResponse<List<Map<String, dynamic>>>> getBlerjeKategoria() async {
+    print('🌐 getBlerjeKategoria called');
+    return _makeRequest<List<Map<String, dynamic>>>(
+      'GET',
+      '/blerje-kategoria',
+      fromJson: (data) => _parseListData(data),
+    );
+  }
+
+  Future<ApiResponse<List<Map<String, dynamic>>>> getKategoria() async {
+    print('🌐 getKategoria called');
+    return _makeRequest<List<Map<String, dynamic>>>(
+      'GET',
+      '/kategoria',
+      fromJson: (data) => _parseListData(data),
+    );
+  }
+
+  Future<ApiResponse<List<Map<String, dynamic>>>> getMenyraPageses() async {
+    print('🌐 getMenyraPageses called');
+    return _makeRequest<List<Map<String, dynamic>>>(
+      'GET',
+      '/menyra-pageses',
+      fromJson: (data) => _parseListData(data),
+    );
+  }
+
+  Future<ApiResponse<List<Map<String, dynamic>>>> getPagesat() async {
+    print('🌐 getPagesat called');
+    return _makeRequest<List<Map<String, dynamic>>>(
+      'GET',
+      '/pagesat',
+      fromJson: (data) => _parseListData(data),
+    );
+  }
+
+  Future<ApiResponse<List<Map<String, dynamic>>>> getPorosia() async {
+    print('🌐 getPorosia called');
+    return _makeRequest<List<Map<String, dynamic>>>(
+      'GET',
+      '/porosia',
+      fromJson: (data) => _parseListData(data),
+    );
+  }
+
+  Future<ApiResponse<List<Map<String, dynamic>>>> getPorositeEBlerjes() async {
+    print('🌐 getPorositeEBlerjes called');
+    return _makeRequest<List<Map<String, dynamic>>>(
+      'GET',
+      '/porosite-e-blerjes',
+      fromJson: (data) => _parseListData(data),
+    );
+  }
+
+  Future<ApiResponse<List<Map<String, dynamic>>>> getShfrytezuesi() async {
+    print('🌐 getShfrytezuesi called');
+    return _makeRequest<List<Map<String, dynamic>>>(
+      'GET',
+      '/shfrytezuesi',
+      fromJson: (data) => _parseListData(data),
+    );
+  }
+
+  Future<ApiResponse<List<Map<String, dynamic>>>> getTavolina() async {
+    print('🌐 getTavolina called');
+    return _makeRequest<List<Map<String, dynamic>>>(
+      'GET',
+      '/tavolina',
+      fromJson: (data) => _parseListData(data),
+    );
+  }
+
+  Future<ApiResponse<List<Map<String, dynamic>>>> getTVSH() async {
+    print('🌐 getTVSH called');
+    return _makeRequest<List<Map<String, dynamic>>>(
+      'GET',
+      '/tvsh',
+      fromJson: (data) => _parseListData(data),
+    );
+  }
+
+  Future<ApiResponse<List<Map<String, dynamic>>>> getNormativa() async {
+    print('🌐 getNormativa called');
+    return _makeRequest<List<Map<String, dynamic>>>(
+      'GET',
+      '/normativa',
+      fromJson: (data) => _parseListData(data),
+    );
+  }
+
+  Future<ApiResponse<List<Map<String, dynamic>>>> getZRaportet() async {
+    print('🌐 getZRaportet called');
+    return _makeRequest<List<Map<String, dynamic>>>(
+      'GET',
+      '/zraportet',
+      fromJson: (data) => _parseListData(data),
+    );
+  }
+
   // Entity endpoints
   Future<ApiResponse<PaginatedResponse<T>>> getEntities<T>(
     String table, {
@@ -168,7 +399,7 @@ class ApiService {
     int limit = 50,
     String? search,
     Map<String, dynamic>? filters,
-    T Function(Map<String, dynamic>)? fromJson,
+    T Function(dynamic)? fromJson,
   }) async {
     print('🌐 getEntities called for table: $table');
     final queryParams = <String, String>{
@@ -200,7 +431,7 @@ class ApiService {
   Future<ApiResponse<T>> getEntity<T>(
     String table,
     int id, {
-    T Function(Map<String, dynamic>)? fromJson,
+    T Function(dynamic)? fromJson,
   }) async {
     return _makeRequest<T>(
       'GET',
@@ -216,7 +447,7 @@ class ApiService {
   Future<ApiResponse<T>> createEntity<T>(
     String table,
     Map<String, dynamic> data, {
-    T Function(Map<String, dynamic>)? fromJson,
+    T Function(dynamic)? fromJson,
   }) async {
     return _makeRequest<T>(
       'POST',
@@ -233,7 +464,7 @@ class ApiService {
     String table,
     int id,
     Map<String, dynamic> data, {
-    T Function(Map<String, dynamic>)? fromJson,
+    T Function(dynamic)? fromJson,
   }) async {
     return _makeRequest<T>(
       'PUT',
@@ -303,7 +534,7 @@ class PaginatedResponse<T> {
 
   factory PaginatedResponse.fromJson(
     Map<String, dynamic> json,
-    T Function(Map<String, dynamic>)? fromJson,
+    T Function(dynamic)? fromJson,
   ) {
     print('🌐 PaginatedResponse.fromJson called with: $json');
     
@@ -333,6 +564,10 @@ class PaginationInfo {
     required this.total,
     required this.totalPages,
   });
+
+  bool get hasMore => page < totalPages;
+  int get currentPage => page;
+  int get totalItems => total;
 
   factory PaginationInfo.fromJson(Map<String, dynamic> json) {
     return PaginationInfo(

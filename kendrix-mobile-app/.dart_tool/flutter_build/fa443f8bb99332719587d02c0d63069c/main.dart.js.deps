@@ -1019,11 +1019,6 @@ file:///C:/Users/qendr/OneDrive/Desktop/Personal/Personal-projects/kendrix-clien
 file:///C:/Users/qendr/OneDrive/Desktop/Personal/Personal-projects/kendrix-client/kendrix-mobile-app/lib/features/common_lists/models/fatura.freezed.dart
 file:///C:/Users/qendr/OneDrive/Desktop/Personal/Personal-projects/kendrix-client/kendrix-mobile-app/lib/features/common_lists/models/fatura.g.dart
 file:///C:/Users/qendr/OneDrive/Desktop/Personal/Personal-projects/kendrix-client/kendrix-mobile-app/lib/features/common_lists/providers/entity_providers.dart
-file:///C:/Users/qendr/OneDrive/Desktop/Personal/Personal-projects/kendrix-client/kendrix-mobile-app/lib/features/common_lists/screens/artikulli_baze_list_screen.dart
-file:///C:/Users/qendr/OneDrive/Desktop/Personal/Personal-projects/kendrix-client/kendrix-mobile-app/lib/features/common_lists/screens/blerjet_list_screen.dart
-file:///C:/Users/qendr/OneDrive/Desktop/Personal/Personal-projects/kendrix-client/kendrix-mobile-app/lib/features/common_lists/screens/fatura_list_screen.dart
-file:///C:/Users/qendr/OneDrive/Desktop/Personal/Personal-projects/kendrix-client/kendrix-mobile-app/lib/features/common_lists/screens/generic_entity_list_screen.dart
-file:///C:/Users/qendr/OneDrive/Desktop/Personal/Personal-projects/kendrix-client/kendrix-mobile-app/lib/features/common_lists/screens/stoku_list_screen.dart
 file:///C:/Users/qendr/OneDrive/Desktop/Personal/Personal-projects/kendrix-client/kendrix-mobile-app/lib/features/dashboard/screens/dashboard_screen.dart
 file:///C:/Users/qendr/OneDrive/Desktop/Personal/Personal-projects/kendrix-client/kendrix-mobile-app/lib/features/tenant_switcher/screens/tenant_selector_screen.dart
 file:///C:/Users/qendr/OneDrive/Desktop/Personal/Personal-projects/kendrix-client/kendrix-mobile-app/lib/gen_l10n/app_localizations.dart
@@ -1033,8 +1028,6 @@ file:///C:/Users/qendr/OneDrive/Desktop/Personal/Personal-projects/kendrix-clien
 file:///C:/Users/qendr/OneDrive/Desktop/Personal/Personal-projects/kendrix-client/kendrix-mobile-app/lib/main_dev.dart
 file:///C:/Users/qendr/OneDrive/Desktop/Personal/Personal-projects/kendrix-client/kendrix-mobile-app/lib/widgets/app_drawer.dart
 file:///C:/Users/qendr/OneDrive/Desktop/Personal/Personal-projects/kendrix-client/kendrix-mobile-app/lib/widgets/app_scaffold.dart
-file:///C:/Users/qendr/OneDrive/Desktop/Personal/Personal-projects/kendrix-client/kendrix-mobile-app/lib/widgets/empty_state.dart
-file:///C:/Users/qendr/OneDrive/Desktop/Personal/Personal-projects/kendrix-client/kendrix-mobile-app/lib/widgets/error_view.dart
 file:///C:/Users/qendr/OneDrive/Desktop/Personal/Personal-projects/kendrix-client/kendrix-mobile-app/lib/widgets/shimmer_box.dart
 file:///C:/flutter/bin/cache/flutter_web_sdk/kernel/dart2js_platform.dill
 file:///C:/flutter/packages/flutter/lib/animation.dart

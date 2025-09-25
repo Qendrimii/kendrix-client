@@ -61,9 +61,9 @@ class RouteGuard {
   Future<String?> authGuard(GoRouterState state) async {
     print('🔐 Auth guard checking route: ${state.matchedLocation}');
     
-    // Check auth state from provider instead of repository to avoid race conditions
-    final authState = _ref.read(authStateProvider);
-    final isAuth = authState.isAuthenticated;
+    // Check authentication status using the repository method
+    final authRepository = _ref.read(authRepositoryProvider);
+    final isAuth = await authRepository.isAuthenticated();
     
     print('🔐 Authentication status: $isAuth for route: ${state.matchedLocation}');
     

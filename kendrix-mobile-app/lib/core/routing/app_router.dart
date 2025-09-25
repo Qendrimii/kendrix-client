@@ -5,6 +5,12 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../../features/auth/screens/login_screen.dart';
 import '../../features/dashboard/screens/dashboard_screen.dart';
 import '../../features/tenant_switcher/screens/tenant_selector_screen.dart';
+import '../../features/common_lists/screens/artikulli_baze_list_screen.dart';
+import '../../features/common_lists/screens/fatura_list_screen.dart';
+import '../../features/common_lists/screens/blerjet_list_screen.dart';
+import '../../features/common_lists/screens/stoku_list_screen.dart';
+import '../../features/common_lists/screens/generic_entity_list_screen.dart';
+import '../../features/common_lists/screens/paginated_entity_list_screen.dart';
 import '../../widgets/app_scaffold.dart';
 import 'route_guards.dart';
 
@@ -154,7 +160,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             name: AppRoute.artikulliBaze.name,
             pageBuilder: (context, state) => NoTransitionPage(
               key: state.pageKey,
-              child: const ArtikulliBazeListScreen(),
+              child: const PaginatedEntityListScreen(
+                title: 'Artikulli Baze',
+                tableName: 'ArtikulliBaze',
+              ),
             ),
             routes: [
               GoRoute(
@@ -162,9 +171,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 name: AppRoute.artikulliBazeDetail.name,
                 pageBuilder: (context, state) => MaterialPage(
                   key: state.pageKey,
-                  child: ArtikulliBazeDetailScreen(
-                    id: int.parse(state.pathParameters['id']!),
-                  ),
+                  child: Placeholder(), // TODO: Implement detail screen
                 ),
               ),
             ],
@@ -175,7 +182,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             name: AppRoute.blerjeKategoria.name,
             pageBuilder: (context, state) => NoTransitionPage(
               key: state.pageKey,
-              child: const BlerjeKategoriaListScreen(),
+              child: const PaginatedEntityListScreen(
+                title: 'Blerje Kategoria',
+                tableName: 'BlerjeKategoria',
+              ),
             ),
           ),
 
@@ -192,9 +202,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 name: AppRoute.blerjetDetail.name,
                 pageBuilder: (context, state) => MaterialPage(
                   key: state.pageKey,
-                  child: BlerjetDetailScreen(
-                    id: int.parse(state.pathParameters['id']!),
-                  ),
+                  child: Placeholder(), // TODO: Implement detail screen
                 ),
               ),
             ],
@@ -213,9 +221,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 name: AppRoute.faturaDetail.name,
                 pageBuilder: (context, state) => MaterialPage(
                   key: state.pageKey,
-                  child: FaturaDetailScreen(
-                    id: int.parse(state.pathParameters['id']!),
-                  ),
+                  child: Placeholder(), // TODO: Implement detail screen
                 ),
               ),
             ],
@@ -226,7 +232,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             name: AppRoute.subjektet.name,
             pageBuilder: (context, state) => NoTransitionPage(
               key: state.pageKey,
-              child: const SubjektetListScreen(),
+              child: const PaginatedEntityListScreen(
+                title: 'Subjektet',
+                tableName: 'Subjektet',
+              ),
             ),
             routes: [
               GoRoute(
@@ -234,9 +243,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 name: AppRoute.subjektetDetail.name,
                 pageBuilder: (context, state) => MaterialPage(
                   key: state.pageKey,
-                  child: SubjektetDetailScreen(
-                    id: int.parse(state.pathParameters['id']!),
-                  ),
+                  child: Placeholder(), // TODO: Implement detail screen
                 ),
               ),
             ],
@@ -280,7 +287,10 @@ List<RouteBase> businessEntityRoutes() {
       name: AppRoute.faturaKategoria.name,
       pageBuilder: (context, state) => NoTransitionPage(
         key: state.pageKey,
-        child: const FaturaKategoriaListScreen(),
+        child: const PaginatedEntityListScreen(
+          title: 'Fatura Kategoria',
+          tableName: 'FaturaKategoria',
+        ),
       ),
     ),
     GoRoute(
@@ -288,7 +298,10 @@ List<RouteBase> businessEntityRoutes() {
       name: AppRoute.kategoria.name,
       pageBuilder: (context, state) => NoTransitionPage(
         key: state.pageKey,
-        child: const KategoriaListScreen(),
+        child: const GenericEntityListScreen.category(
+          title: 'Kategoria',
+          tableName: 'Kategoria',
+        ),
       ),
     ),
     GoRoute(
@@ -296,7 +309,10 @@ List<RouteBase> businessEntityRoutes() {
       name: AppRoute.materializedDaily.name,
       pageBuilder: (context, state) => NoTransitionPage(
         key: state.pageKey,
-        child: const MaterializedDailyListScreen(),
+        child: const GenericEntityListScreen.basic(
+          title: 'Materialized Daily',
+          tableName: 'MaterializedDaily',
+        ),
       ),
     ),
     GoRoute(
@@ -304,7 +320,10 @@ List<RouteBase> businessEntityRoutes() {
       name: AppRoute.menyraPageses.name,
       pageBuilder: (context, state) => NoTransitionPage(
         key: state.pageKey,
-        child: const MenyraPagesestListScreen(),
+        child: const PaginatedEntityListScreen(
+          title: 'Menyra Pageses',
+          tableName: 'MenyraPageses',
+        ),
       ),
     ),
     GoRoute(
@@ -312,7 +331,10 @@ List<RouteBase> businessEntityRoutes() {
       name: AppRoute.normativa.name,
       pageBuilder: (context, state) => NoTransitionPage(
         key: state.pageKey,
-        child: const NormativaListScreen(),
+        child: const GenericEntityListScreen.basic(
+          title: 'Normativa',
+          tableName: 'Normativa',
+        ),
       ),
     ),
     GoRoute(
@@ -320,7 +342,10 @@ List<RouteBase> businessEntityRoutes() {
       name: AppRoute.pagesat.name,
       pageBuilder: (context, state) => NoTransitionPage(
         key: state.pageKey,
-        child: const PagesatListScreen(),
+        child: const GenericEntityListScreen.basic(
+          title: 'Pagesat',
+          tableName: 'Pagesat',
+        ),
       ),
     ),
     GoRoute(
@@ -328,7 +353,10 @@ List<RouteBase> businessEntityRoutes() {
       name: AppRoute.porosia.name,
       pageBuilder: (context, state) => NoTransitionPage(
         key: state.pageKey,
-        child: const PorosiaListScreen(),
+        child: const PaginatedEntityListScreen(
+          title: 'Porosia',
+          tableName: 'Porosia',
+        ),
       ),
     ),
     GoRoute(
@@ -336,7 +364,10 @@ List<RouteBase> businessEntityRoutes() {
       name: AppRoute.porositeEBlerjes.name,
       pageBuilder: (context, state) => NoTransitionPage(
         key: state.pageKey,
-        child: const PorositeEBlerjesListScreen(),
+        child: const GenericEntityListScreen.basic(
+          title: 'Porosite e Blerjes',
+          tableName: 'PorositeEBlerjes',
+        ),
       ),
     ),
     GoRoute(
@@ -344,15 +375,10 @@ List<RouteBase> businessEntityRoutes() {
       name: AppRoute.shfrytezuesi.name,
       pageBuilder: (context, state) => NoTransitionPage(
         key: state.pageKey,
-        child: const ShfrytezuesiListScreen(),
-      ),
-    ),
-    GoRoute(
-      path: AppRoute.stoku.path,
-      name: AppRoute.stoku.name,
-      pageBuilder: (context, state) => NoTransitionPage(
-        key: state.pageKey,
-        child: const StokuListScreen(),
+        child: const PaginatedEntityListScreen(
+          title: 'Shfrytezuesi',
+          tableName: 'Shfrytezuesi',
+        ),
       ),
     ),
     GoRoute(
@@ -360,7 +386,10 @@ List<RouteBase> businessEntityRoutes() {
       name: AppRoute.tavolina.name,
       pageBuilder: (context, state) => NoTransitionPage(
         key: state.pageKey,
-        child: const TavolinaListScreen(),
+        child: const GenericEntityListScreen.basic(
+          title: 'Tavolina',
+          tableName: 'Tavolina',
+        ),
       ),
     ),
     GoRoute(
@@ -368,7 +397,10 @@ List<RouteBase> businessEntityRoutes() {
       name: AppRoute.tvsh.name,
       pageBuilder: (context, state) => NoTransitionPage(
         key: state.pageKey,
-        child: const TVSHListScreen(),
+        child: const GenericEntityListScreen.basic(
+          title: 'TVSH',
+          tableName: 'TVSH',
+        ),
       ),
     ),
     GoRoute(
@@ -376,175 +408,99 @@ List<RouteBase> businessEntityRoutes() {
       name: AppRoute.zRaportet.name,
       pageBuilder: (context, state) => NoTransitionPage(
         key: state.pageKey,
-        child: const ZRaportetListScreen(),
+        child: const GenericEntityListScreen.basic(
+          title: 'Z-Raportet',
+          tableName: 'ZRaportet',
+        ),
       ),
     ),
   ];
 }
 
-// Placeholder screens - these will be implemented in the next phases
+// Placeholder admin screens - these will be implemented in the next phases
 class AdminTenantsScreen extends StatelessWidget {
   const AdminTenantsScreen({super.key});
-  @override Widget build(BuildContext context) => const Placeholder();
+  @override Widget build(BuildContext context) => Scaffold(
+    appBar: AppBar(title: const Text('Admin - Tenants')),
+    body: const Center(child: Text('Admin Tenants Screen - Coming Soon')),
+  );
 }
 
 class CreateEditTenantScreen extends StatelessWidget {
   final int? tenantId;
   const CreateEditTenantScreen({super.key, this.tenantId});
-  @override Widget build(BuildContext context) => const Placeholder();
+  @override Widget build(BuildContext context) => Scaffold(
+    appBar: AppBar(title: const Text('Create/Edit Tenant')),
+    body: const Center(child: Text('Create/Edit Tenant Screen - Coming Soon')),
+  );
 }
 
 class AdminUsersScreen extends StatelessWidget {
   const AdminUsersScreen({super.key});
-  @override Widget build(BuildContext context) => const Placeholder();
+  @override Widget build(BuildContext context) => Scaffold(
+    appBar: AppBar(title: const Text('Admin - Users')),
+    body: const Center(child: Text('Admin Users Screen - Coming Soon')),
+  );
 }
 
 class CreateEditUserScreen extends StatelessWidget {
   final int? userId;
   const CreateEditUserScreen({super.key, this.userId});
-  @override Widget build(BuildContext context) => const Placeholder();
+  @override Widget build(BuildContext context) => Scaffold(
+    appBar: AppBar(title: const Text('Create/Edit User')),
+    body: const Center(child: Text('Create/Edit User Screen - Coming Soon')),
+  );
 }
 
 class AdminRolesScreen extends StatelessWidget {
   const AdminRolesScreen({super.key});
-  @override Widget build(BuildContext context) => const Placeholder();
+  @override Widget build(BuildContext context) => Scaffold(
+    appBar: AppBar(title: const Text('Admin - Roles')),
+    body: const Center(child: Text('Admin Roles Screen - Coming Soon')),
+  );
 }
 
 class AdminUserTenantsScreen extends StatelessWidget {
   const AdminUserTenantsScreen({super.key});
-  @override Widget build(BuildContext context) => const Placeholder();
+  @override Widget build(BuildContext context) => Scaffold(
+    appBar: AppBar(title: const Text('Admin - User Tenants')),
+    body: const Center(child: Text('Admin User Tenants Screen - Coming Soon')),
+  );
 }
 
-class ArtikulliBazeListScreen extends StatelessWidget {
-  const ArtikulliBazeListScreen({super.key});
-  @override Widget build(BuildContext context) => const Placeholder();
-}
-
-class ArtikulliBazeDetailScreen extends StatelessWidget {
-  final int id;
-  const ArtikulliBazeDetailScreen({super.key, required this.id});
-  @override Widget build(BuildContext context) => const Placeholder();
-}
-
-class BlerjeKategoriaListScreen extends StatelessWidget {
-  const BlerjeKategoriaListScreen({super.key});
-  @override Widget build(BuildContext context) => const Placeholder();
-}
-
-class BlerjetListScreen extends StatelessWidget {
-  const BlerjetListScreen({super.key});
-  @override Widget build(BuildContext context) => const Placeholder();
-}
-
-class BlerjetDetailScreen extends StatelessWidget {
-  final int id;
-  const BlerjetDetailScreen({super.key, required this.id});
-  @override Widget build(BuildContext context) => const Placeholder();
-}
-
-class FaturaListScreen extends StatelessWidget {
-  const FaturaListScreen({super.key});
-  @override Widget build(BuildContext context) => const Placeholder();
-}
-
-class FaturaDetailScreen extends StatelessWidget {
-  final int id;
-  const FaturaDetailScreen({super.key, required this.id});
-  @override Widget build(BuildContext context) => const Placeholder();
-}
-
-class FaturaKategoriaListScreen extends StatelessWidget {
-  const FaturaKategoriaListScreen({super.key});
-  @override Widget build(BuildContext context) => const Placeholder();
-}
-
-class KategoriaListScreen extends StatelessWidget {
-  const KategoriaListScreen({super.key});
-  @override Widget build(BuildContext context) => const Placeholder();
-}
-
-class MaterializedDailyListScreen extends StatelessWidget {
-  const MaterializedDailyListScreen({super.key});
-  @override Widget build(BuildContext context) => const Placeholder();
-}
-
-class MenyraPagesestListScreen extends StatelessWidget {
-  const MenyraPagesestListScreen({super.key});
-  @override Widget build(BuildContext context) => const Placeholder();
-}
-
-class NormativaListScreen extends StatelessWidget {
-  const NormativaListScreen({super.key});
-  @override Widget build(BuildContext context) => const Placeholder();
-}
-
-class PagesatListScreen extends StatelessWidget {
-  const PagesatListScreen({super.key});
-  @override Widget build(BuildContext context) => const Placeholder();
-}
-
-class PorosiaListScreen extends StatelessWidget {
-  const PorosiaListScreen({super.key});
-  @override Widget build(BuildContext context) => const Placeholder();
-}
-
-class PorositeEBlerjesListScreen extends StatelessWidget {
-  const PorositeEBlerjesListScreen({super.key});
-  @override Widget build(BuildContext context) => const Placeholder();
-}
-
-class ShfrytezuesiListScreen extends StatelessWidget {
-  const ShfrytezuesiListScreen({super.key});
-  @override Widget build(BuildContext context) => const Placeholder();
-}
-
-class StokuListScreen extends StatelessWidget {
-  const StokuListScreen({super.key});
-  @override Widget build(BuildContext context) => const Placeholder();
-}
-
-class SubjektetListScreen extends StatelessWidget {
-  const SubjektetListScreen({super.key});
-  @override Widget build(BuildContext context) => const Placeholder();
-}
-
-class SubjektetDetailScreen extends StatelessWidget {
-  final int id;
-  const SubjektetDetailScreen({super.key, required this.id});
-  @override Widget build(BuildContext context) => const Placeholder();
-}
-
-class TavolinaListScreen extends StatelessWidget {
-  const TavolinaListScreen({super.key});
-  @override Widget build(BuildContext context) => const Placeholder();
-}
-
-class TVSHListScreen extends StatelessWidget {
-  const TVSHListScreen({super.key});
-  @override Widget build(BuildContext context) => const Placeholder();
-}
-
-class ZRaportetListScreen extends StatelessWidget {
-  const ZRaportetListScreen({super.key});
-  @override Widget build(BuildContext context) => const Placeholder();
-}
-
+// Basic placeholder screens for settings and profile
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
-  @override Widget build(BuildContext context) => const Placeholder();
+  @override Widget build(BuildContext context) => Scaffold(
+    appBar: AppBar(title: const Text('Settings')),
+    body: const Center(child: Text('Settings Screen - Coming Soon')),
+  );
 }
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
-  @override Widget build(BuildContext context) => const Placeholder();
+  @override Widget build(BuildContext context) => Scaffold(
+    appBar: AppBar(title: const Text('Profile')),
+    body: const Center(child: Text('Profile Screen - Coming Soon')),
+  );
 }
 
 class ErrorScreen extends StatelessWidget {
   final Exception? error;
   const ErrorScreen({super.key, this.error});
   @override Widget build(BuildContext context) => Scaffold(
+    appBar: AppBar(title: const Text('Error')),
     body: Center(
-      child: Text('Error: ${error.toString()}'),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(Icons.error, size: 64, color: Colors.red),
+          const SizedBox(height: 16),
+          Text('An error occurred:'),
+          const SizedBox(height: 8),
+          Text(error?.toString() ?? 'Unknown error'),
+        ],
+      ),
     ),
   );
 }

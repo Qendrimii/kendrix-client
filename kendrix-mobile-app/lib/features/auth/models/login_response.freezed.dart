@@ -20,8 +20,13 @@ LoginResponse _$LoginResponseFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$LoginResponse {
+  @JsonKey(name: 'access_token')
   String get token => throw _privateConstructorUsedError;
+  @JsonKey(name: 'refresh_token')
+  String? get refreshToken => throw _privateConstructorUsedError;
   User get user => throw _privateConstructorUsedError;
+  @JsonKey(name: 'tenant')
+  Map<String, dynamic>? get tenant => throw _privateConstructorUsedError;
   @JsonKey(name: 'expiresAt')
   String? get expiresAt => throw _privateConstructorUsedError;
 
@@ -38,7 +43,11 @@ abstract class $LoginResponseCopyWith<$Res> {
       _$LoginResponseCopyWithImpl<$Res, LoginResponse>;
   @useResult
   $Res call(
-      {String token, User user, @JsonKey(name: 'expiresAt') String? expiresAt});
+      {@JsonKey(name: 'access_token') String token,
+      @JsonKey(name: 'refresh_token') String? refreshToken,
+      User user,
+      @JsonKey(name: 'tenant') Map<String, dynamic>? tenant,
+      @JsonKey(name: 'expiresAt') String? expiresAt});
 
   $UserCopyWith<$Res> get user;
 }
@@ -57,7 +66,9 @@ class _$LoginResponseCopyWithImpl<$Res, $Val extends LoginResponse>
   @override
   $Res call({
     Object? token = null,
+    Object? refreshToken = freezed,
     Object? user = null,
+    Object? tenant = freezed,
     Object? expiresAt = freezed,
   }) {
     return _then(_value.copyWith(
@@ -65,10 +76,18 @@ class _$LoginResponseCopyWithImpl<$Res, $Val extends LoginResponse>
           ? _value.token
           : token // ignore: cast_nullable_to_non_nullable
               as String,
+      refreshToken: freezed == refreshToken
+          ? _value.refreshToken
+          : refreshToken // ignore: cast_nullable_to_non_nullable
+              as String?,
       user: null == user
           ? _value.user
           : user // ignore: cast_nullable_to_non_nullable
               as User,
+      tenant: freezed == tenant
+          ? _value.tenant
+          : tenant // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>?,
       expiresAt: freezed == expiresAt
           ? _value.expiresAt
           : expiresAt // ignore: cast_nullable_to_non_nullable
@@ -94,7 +113,11 @@ abstract class _$$LoginResponseImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {String token, User user, @JsonKey(name: 'expiresAt') String? expiresAt});
+      {@JsonKey(name: 'access_token') String token,
+      @JsonKey(name: 'refresh_token') String? refreshToken,
+      User user,
+      @JsonKey(name: 'tenant') Map<String, dynamic>? tenant,
+      @JsonKey(name: 'expiresAt') String? expiresAt});
 
   @override
   $UserCopyWith<$Res> get user;
@@ -112,7 +135,9 @@ class __$$LoginResponseImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? token = null,
+    Object? refreshToken = freezed,
     Object? user = null,
+    Object? tenant = freezed,
     Object? expiresAt = freezed,
   }) {
     return _then(_$LoginResponseImpl(
@@ -120,10 +145,18 @@ class __$$LoginResponseImplCopyWithImpl<$Res>
           ? _value.token
           : token // ignore: cast_nullable_to_non_nullable
               as String,
+      refreshToken: freezed == refreshToken
+          ? _value.refreshToken
+          : refreshToken // ignore: cast_nullable_to_non_nullable
+              as String?,
       user: null == user
           ? _value.user
           : user // ignore: cast_nullable_to_non_nullable
               as User,
+      tenant: freezed == tenant
+          ? _value._tenant
+          : tenant // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>?,
       expiresAt: freezed == expiresAt
           ? _value.expiresAt
           : expiresAt // ignore: cast_nullable_to_non_nullable
@@ -136,24 +169,42 @@ class __$$LoginResponseImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$LoginResponseImpl implements _LoginResponse {
   const _$LoginResponseImpl(
-      {required this.token,
+      {@JsonKey(name: 'access_token') required this.token,
+      @JsonKey(name: 'refresh_token') this.refreshToken,
       required this.user,
-      @JsonKey(name: 'expiresAt') this.expiresAt});
+      @JsonKey(name: 'tenant') final Map<String, dynamic>? tenant,
+      @JsonKey(name: 'expiresAt') this.expiresAt})
+      : _tenant = tenant;
 
   factory _$LoginResponseImpl.fromJson(Map<String, dynamic> json) =>
       _$$LoginResponseImplFromJson(json);
 
   @override
+  @JsonKey(name: 'access_token')
   final String token;
   @override
+  @JsonKey(name: 'refresh_token')
+  final String? refreshToken;
+  @override
   final User user;
+  final Map<String, dynamic>? _tenant;
+  @override
+  @JsonKey(name: 'tenant')
+  Map<String, dynamic>? get tenant {
+    final value = _tenant;
+    if (value == null) return null;
+    if (_tenant is EqualUnmodifiableMapView) return _tenant;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(value);
+  }
+
   @override
   @JsonKey(name: 'expiresAt')
   final String? expiresAt;
 
   @override
   String toString() {
-    return 'LoginResponse(token: $token, user: $user, expiresAt: $expiresAt)';
+    return 'LoginResponse(token: $token, refreshToken: $refreshToken, user: $user, tenant: $tenant, expiresAt: $expiresAt)';
   }
 
   @override
@@ -162,14 +213,18 @@ class _$LoginResponseImpl implements _LoginResponse {
         (other.runtimeType == runtimeType &&
             other is _$LoginResponseImpl &&
             (identical(other.token, token) || other.token == token) &&
+            (identical(other.refreshToken, refreshToken) ||
+                other.refreshToken == refreshToken) &&
             (identical(other.user, user) || other.user == user) &&
+            const DeepCollectionEquality().equals(other._tenant, _tenant) &&
             (identical(other.expiresAt, expiresAt) ||
                 other.expiresAt == expiresAt));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, token, user, expiresAt);
+  int get hashCode => Object.hash(runtimeType, token, refreshToken, user,
+      const DeepCollectionEquality().hash(_tenant), expiresAt);
 
   @JsonKey(ignore: true)
   @override
@@ -187,8 +242,10 @@ class _$LoginResponseImpl implements _LoginResponse {
 
 abstract class _LoginResponse implements LoginResponse {
   const factory _LoginResponse(
-          {required final String token,
+          {@JsonKey(name: 'access_token') required final String token,
+          @JsonKey(name: 'refresh_token') final String? refreshToken,
           required final User user,
+          @JsonKey(name: 'tenant') final Map<String, dynamic>? tenant,
           @JsonKey(name: 'expiresAt') final String? expiresAt}) =
       _$LoginResponseImpl;
 
@@ -196,9 +253,16 @@ abstract class _LoginResponse implements LoginResponse {
       _$LoginResponseImpl.fromJson;
 
   @override
+  @JsonKey(name: 'access_token')
   String get token;
   @override
+  @JsonKey(name: 'refresh_token')
+  String? get refreshToken;
+  @override
   User get user;
+  @override
+  @JsonKey(name: 'tenant')
+  Map<String, dynamic>? get tenant;
   @override
   @JsonKey(name: 'expiresAt')
   String? get expiresAt;

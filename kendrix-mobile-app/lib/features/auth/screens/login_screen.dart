@@ -4,6 +4,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/auth/auth_repository.dart';
+import '../../../core/auth/token_storage.dart';
 import '../../../core/i18n/l10n.dart';
 import '../models/login_request.dart';
 
@@ -15,10 +16,25 @@ class LoginScreen extends HookConsumerWidget {
     final l10n = context.l10n;
     final emailController = useTextEditingController();
     final passwordController = useTextEditingController();
+    final tenantKeyController = useTextEditingController();
     final formKey = useMemoized(() => GlobalKey<FormState>());
     final obscurePassword = useState(true);
+    final showTenantKeyField = useState(false);
+    final rememberTenantKey = useState(false);
     
     final authState = ref.watch(authStateProvider);
+    final tokenStorage = ref.watch(tokenStorageProvider);
+
+    // Load saved tenant key on init
+    useEffect(() {
+      tokenStorage.getRememberedTenantKey().then((savedKey) {
+        if (savedKey != null) {
+          tenantKeyController.text = savedKey;
+          rememberTenantKey.value = true;
+        }
+      });
+      return null;
+    }, []);
 
     return Scaffold(
       body: Center(
@@ -111,9 +127,75 @@ class LoginScreen extends HookConsumerWidget {
                       formKey,
                       emailController,
                       passwordController,
+                      tenantKeyController,
+                      rememberTenantKey.value,
+                      tokenStorage,
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 16),
+
+                  // Tenant Key field (shown when options are expanded)
+                  if (showTenantKeyField.value) ...[
+                    TextFormField(
+                      controller: tenantKeyController,
+                      textInputAction: TextInputAction.done,
+                      decoration: InputDecoration(
+                        labelText: 'Tenant Key',
+                        hintText: 'e.g., KENDRIX-CLIENT-001',
+                        prefixIcon: const Icon(Icons.business_outlined),
+                        helperText: 'Enter your organization\'s tenant key',
+                      ),
+                      validator: (value) {
+                        if (showTenantKeyField.value && (value == null || value.isEmpty)) {
+                          return 'Tenant key is required';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    
+                    // Remember tenant key checkbox
+                    Row(
+                      children: [
+                        Checkbox(
+                          value: rememberTenantKey.value,
+                          onChanged: (value) {
+                            rememberTenantKey.value = value ?? false;
+                          },
+                        ),
+                        const Text('Remember tenant key'),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+
+                  // Options button
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      TextButton.icon(
+                        onPressed: () {
+                          showTenantKeyField.value = !showTenantKeyField.value;
+                        },
+                        icon: Icon(
+                          showTenantKeyField.value 
+                            ? Icons.keyboard_arrow_up 
+                            : Icons.keyboard_arrow_down
+                        ),
+                        label: Text(showTenantKeyField.value ? 'Hide Options' : 'Options'),
+                      ),
+                      if (showTenantKeyField.value)
+                        TextButton(
+                          onPressed: () {
+                            tenantKeyController.clear();
+                            rememberTenantKey.value = false;
+                            tokenStorage.clearRememberedTenantKey();
+                          },
+                          child: const Text('Clear Saved'),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
 
                   // Login button
                   FilledButton(
@@ -125,6 +207,9 @@ class LoginScreen extends HookConsumerWidget {
                               formKey,
                               emailController,
                               passwordController,
+                              tenantKeyController,
+                              rememberTenantKey.value,
+                              tokenStorage,
                             ),
                     child: authState.isLoading
                         ? const SizedBox(
@@ -216,16 +301,31 @@ class LoginScreen extends HookConsumerWidget {
     GlobalKey<FormState> formKey,
     TextEditingController emailController,
     TextEditingController passwordController,
+    TextEditingController tenantKeyController,
+    bool rememberTenantKey,
+    TokenStorage tokenStorage,
   ) async {
     if (!formKey.currentState!.validate()) return;
 
+    final tenantKey = tenantKeyController.text.trim();
+    
     final request = LoginRequest(
       email: emailController.text.trim(),
       password: passwordController.text,
+      tenantKey: tenantKey.isNotEmpty ? tenantKey : null,
     );
 
     try {
       await ref.read(authStateProvider.notifier).login(request);
+      
+      // Manage the "remember tenant key" preference for form pre-filling
+      if (rememberTenantKey && tenantKey.isNotEmpty) {
+        await tokenStorage.setRememberedTenantKey(tenantKey);
+      } else if (!rememberTenantKey) {
+        await tokenStorage.clearRememberedTenantKey();
+      }
+      
+      // The tenant key for API calls is automatically saved by AuthRepository
       
       // Check if login was successful
       final authState = ref.read(authStateProvider);
@@ -237,8 +337,10 @@ class LoginScreen extends HookConsumerWidget {
           ),
         );
         
-        // Let the router handle navigation automatically via auth guard
-        // The router will detect authentication and redirect from login to dashboard
+        // Manually redirect to dashboard after successful login
+        if (context.mounted) {
+          context.go('/dashboard');
+        }
       }
     } catch (e) {
       if (context.mounted) {

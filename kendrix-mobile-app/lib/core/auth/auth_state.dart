@@ -16,30 +16,4 @@ class AuthState with _$AuthState {
   }) = _AuthState;
 }
 
-class AuthStateNotifier extends StateNotifier<AuthState> {
-  AuthStateNotifier() : super(const AuthState());
-
-  void updateAuthState({
-    bool? isAuthenticated,
-    String? userEmail,
-    List<String>? userRoles,
-    List<Map<String, dynamic>>? userTenants,
-    String? currentTenantKey,
-    String? accessToken,
-    String? refreshToken,
-  }) {
-    state = state.copyWith(
-      isAuthenticated: isAuthenticated ?? state.isAuthenticated,
-      userEmail: userEmail ?? state.userEmail,
-      userRoles: userRoles ?? state.userRoles,
-      userTenants: userTenants ?? state.userTenants,
-      currentTenantKey: currentTenantKey ?? state.currentTenantKey,
-      accessToken: accessToken ?? state.accessToken,
-      refreshToken: refreshToken ?? state.refreshToken,
-    );
-  }
-
-  void logout() {
-    state = const AuthState();
-  }
-}
+// AuthStateNotifier is defined in auth_repository.dart

@@ -1,7 +1,13 @@
-2025/09/18-15:23:13.104 7bfc Reusing MANIFEST C:\Users\qendr\AppData\Local\Temp\flutter_tools.6c34139c\flutter_tools_chrome_device.13d5c8dd\Default\shared_proto_db/MANIFEST-000001
-2025/09/18-15:23:13.104 7bfc Recovering log #13
-2025/09/18-15:23:13.105 7bfc Reusing old log C:\Users\qendr\AppData\Local\Temp\flutter_tools.6c34139c\flutter_tools_chrome_device.13d5c8dd\Default\shared_proto_db/000013.log 
-2025/09/18-15:23:13.106 7bfc Delete type=0 #3
-2025/09/18-15:23:13.106 7bfc Delete type=0 #4
-2025/09/18-15:23:13.106 7bfc Delete type=0 #7
-2025/09/18-15:23:13.106 7bfc Delete type=0 #10
+2025/09/24-23:20:32.036 5460 Reusing MANIFEST C:\Users\qendr\AppData\Local\Temp\flutter_tools.15312713\flutter_tools_chrome_device.ca1ff340\Default\shared_proto_db/MANIFEST-000001
+2025/09/24-23:20:32.037 5460 Recovering log #19
+2025/09/24-23:20:32.038 5460 Reusing old log C:\Users\qendr\AppData\Local\Temp\flutter_tools.15312713\flutter_tools_chrome_device.ca1ff340\Default\shared_proto_db/000019.log 
+2025/09/24-23:20:32.038 5460 Delete type=0 #3
+2025/09/24-23:20:32.039 5460 Delete type=0 #4
+2025/09/24-23:20:32.039 5460 Delete type=0 #7
+2025/09/24-23:20:32.039 5460 Delete type=2 #8
+2025/09/24-23:20:32.039 5460 Delete type=0 #10
+2025/09/24-23:20:32.039 5460 Delete type=2 #11
+2025/09/24-23:20:32.039 5460 Delete type=0 #13
+2025/09/24-23:20:32.039 5460 Delete type=2 #14
+2025/09/24-23:20:32.039 5460 Delete type=0 #16
+2025/09/24-23:20:32.039 5460 Delete type=2 #17

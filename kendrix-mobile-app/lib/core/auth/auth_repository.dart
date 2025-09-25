@@ -26,15 +26,34 @@ class AuthRepository {
         throw Exception('Invalid response from server');
       }
 
-      final loginResponse = LoginResponse.fromJson(response.data!);
+      print('🔐 Raw API response: ${response.data}');
+      print('🔐 Response data type: ${response.data.runtimeType}');
+      print('🔐 Response data keys: ${response.data?.keys.toList()}');
+      
+      // Extract the data part from the API response
+      final responseData = response.data!['data'] as Map<String, dynamic>?;
+      print('🔐 Extracted data: $responseData');
+      if (responseData == null) {
+        throw Exception('Invalid response structure from server');
+      }
+      
+      final loginResponse = LoginResponse.fromJson(responseData);
       
       print('🔐 Login successful! Token: ${loginResponse.token.substring(0, 20)}...');
       
       // Save tokens
+      print('🔐 Saving tokens - access: ${loginResponse.token.substring(0, 20)}..., refresh: ${loginResponse.refreshToken?.substring(0, 20) ?? 'null'}...');
+      
       await _tokenStorage.saveTokens(
         accessToken: loginResponse.token,
-        refreshToken: loginResponse.token, // For simplicity, using same token
+        refreshToken: loginResponse.refreshToken ?? loginResponse.token, // Use refresh token if available
       );
+      
+      // Save tenant key if provided in the login request
+      if (request.tenantKey != null && request.tenantKey!.isNotEmpty) {
+        await _tokenStorage.setTenantKey(request.tenantKey!);
+        print('🔐 Tenant key saved: ${request.tenantKey}');
+      }
       
       // Verify tokens were saved
       final savedToken = await _tokenStorage.getAccessToken();
@@ -168,7 +187,9 @@ class AuthRepository {
       return [];
     }
 
-    return JwtDecoder.getTenants(accessToken);
+    // For now, return empty list since we don't have tenant data in JWT
+    // In a real app, this would come from the JWT or a separate API call
+    return [];
   }
 
   Future<bool> hasRole(String role) async {
@@ -274,11 +295,16 @@ class AuthStateNotifier extends StateNotifier<AuthState> {
   }
 
   Future<void> login(LoginRequest request) async {
+    print('🔐 AuthStateNotifier.login() called');
     state = state.copyWith(isLoading: true, error: null);
     
     try {
+      print('🔐 Calling _authRepository.login()...');
       final response = await _authRepository.login(request);
+      print('🔐 Login response received: ${response.user.email}');
+      
       final tenants = await _authRepository.getUserTenants();
+      print('🔐 User tenants: ${tenants.length}');
       
       state = state.copyWith(
         isAuthenticated: true,
@@ -286,7 +312,9 @@ class AuthStateNotifier extends StateNotifier<AuthState> {
         tenants: tenants,
         isLoading: false,
       );
+      print('🔐 Auth state updated: isAuthenticated = true');
     } catch (e) {
+      print('🔐 Login error: $e');
       state = state.copyWith(
         isAuthenticated: false,
         isLoading: false,

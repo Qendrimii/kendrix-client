@@ -14,21 +14,9 @@ class ArtikulliBazeListScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
     
-    return GenericEntityListScreen<ArtikulliBaze>(
-      title: l10n.products,
+    return const GenericEntityListScreen.basic(
+      title: 'Products',
       tableName: 'ArtikulliBaze',
-      listProvider: artikulliBazeListProvider,
-      emptyTitle: l10n.noProducts,
-      emptySubtitle: l10n.noProductsSubtitle,
-      emptyActionText: l10n.addProduct,
-      emptyIcon: Icons.inventory_2,
-      onCreatePressed: () {
-        // TODO: Navigate to create product screen
-      },
-      itemBuilder: (artikulli, onTap) => _ArtikulliBazeCard(
-        artikulli: artikulli,
-        onTap: onTap,
-      ),
     );
   }
 }

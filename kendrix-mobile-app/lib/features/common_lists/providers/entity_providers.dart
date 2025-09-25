@@ -24,7 +24,7 @@ final dashboardStatsProvider = FutureProvider<DashboardStats>((ref) async {
 class EntityListNotifier<T> extends StateNotifier<AsyncValue<List<T>>> {
   final ApiService _apiService;
   final String _table;
-  final T Function(Map<String, dynamic>) _fromJson;
+  final T Function(dynamic) _fromJson;
   
   EntityListNotifier(this._apiService, this._table, this._fromJson) : super(const AsyncValue.loading()) {
     loadEntities();
@@ -80,14 +80,49 @@ class EntityListNotifier<T> extends StateNotifier<AsyncValue<List<T>>> {
 }
 
 // Fatura Providers
-final faturaListProvider = StateNotifierProvider<EntityListNotifier<Fatura>, AsyncValue<List<Fatura>>>((ref) {
+final faturaListProvider = StateNotifierProvider<FaturaListNotifier, AsyncValue<List<Fatura>>>((ref) {
   final apiService = ref.read(apiServiceProvider);
-  return EntityListNotifier<Fatura>(
-    apiService,
-    'Fatura',
-    (json) => Fatura.fromJson(json),
-  );
+  return FaturaListNotifier(apiService);
 });
+
+class FaturaListNotifier extends StateNotifier<AsyncValue<List<Fatura>>> {
+  final ApiService _apiService;
+  
+  FaturaListNotifier(this._apiService) : super(const AsyncValue.loading()) {
+    loadFatura();
+  }
+
+  Future<void> loadFatura() async {
+    state = const AsyncValue.loading();
+    
+    try {
+      print('🌐 Loading Fatura data...');
+      final response = await _apiService.getFatura();
+      
+      if (response.success && response.data != null) {
+        final faturaList = response.data!.map((json) => Fatura.fromJson(json)).toList();
+        print('🌐 Loaded ${faturaList.length} Fatura records');
+        state = AsyncValue.data(faturaList);
+      } else {
+        print('🌐 Failed to load Fatura: ${response.error}');
+        state = AsyncValue.error(Exception(response.error ?? 'Failed to load Fatura'), StackTrace.current);
+      }
+    } catch (e, stackTrace) {
+      print('🌐 Error loading Fatura: $e');
+      state = AsyncValue.error(e, stackTrace);
+    }
+  }
+
+  Future<void> refresh() async {
+    await loadFatura();
+  }
+
+  Future<void> search(String query) async {
+    // For now, just reload the data
+    // TODO: Implement server-side search
+    await loadFatura();
+  }
+}
 
 final faturaProvider = FutureProvider.family<Fatura, int>((ref, id) async {
   final apiService = ref.read(apiServiceProvider);
@@ -105,14 +140,49 @@ final faturaProvider = FutureProvider.family<Fatura, int>((ref, id) async {
 });
 
 // Blerjet Providers
-final blerjetListProvider = StateNotifierProvider<EntityListNotifier<Blerjet>, AsyncValue<List<Blerjet>>>((ref) {
+final blerjetListProvider = StateNotifierProvider<BlerjetListNotifier, AsyncValue<List<Blerjet>>>((ref) {
   final apiService = ref.read(apiServiceProvider);
-  return EntityListNotifier<Blerjet>(
-    apiService,
-    'Blerjet',
-    (json) => Blerjet.fromJson(json),
-  );
+  return BlerjetListNotifier(apiService);
 });
+
+class BlerjetListNotifier extends StateNotifier<AsyncValue<List<Blerjet>>> {
+  final ApiService _apiService;
+  
+  BlerjetListNotifier(this._apiService) : super(const AsyncValue.loading()) {
+    loadBlerjet();
+  }
+
+  Future<void> loadBlerjet() async {
+    state = const AsyncValue.loading();
+    
+    try {
+      print('🌐 Loading Blerjet data...');
+      final response = await _apiService.getBlerjet();
+      
+      if (response.success && response.data != null) {
+        final blerjetList = response.data!.map((json) => Blerjet.fromJson(json)).toList();
+        print('🌐 Loaded ${blerjetList.length} Blerjet records');
+        state = AsyncValue.data(blerjetList);
+      } else {
+        print('🌐 Failed to load Blerjet: ${response.error}');
+        state = AsyncValue.error(Exception(response.error ?? 'Failed to load Blerjet'), StackTrace.current);
+      }
+    } catch (e, stackTrace) {
+      print('🌐 Error loading Blerjet: $e');
+      state = AsyncValue.error(e, stackTrace);
+    }
+  }
+
+  Future<void> refresh() async {
+    await loadBlerjet();
+  }
+
+  Future<void> search(String query) async {
+    // For now, just reload the data
+    // TODO: Implement server-side search
+    await loadBlerjet();
+  }
+}
 
 final blerjetProvider = FutureProvider.family<Blerjet, int>((ref, id) async {
   final apiService = ref.read(apiServiceProvider);
@@ -130,14 +200,49 @@ final blerjetProvider = FutureProvider.family<Blerjet, int>((ref, id) async {
 });
 
 // Stoku Providers
-final stokuListProvider = StateNotifierProvider<EntityListNotifier<Stoku>, AsyncValue<List<Stoku>>>((ref) {
+final stokuListProvider = StateNotifierProvider<StokuListNotifier, AsyncValue<List<Stoku>>>((ref) {
   final apiService = ref.read(apiServiceProvider);
-  return EntityListNotifier<Stoku>(
-    apiService,
-    'Stoku',
-    (json) => Stoku.fromJson(json),
-  );
+  return StokuListNotifier(apiService);
 });
+
+class StokuListNotifier extends StateNotifier<AsyncValue<List<Stoku>>> {
+  final ApiService _apiService;
+  
+  StokuListNotifier(this._apiService) : super(const AsyncValue.loading()) {
+    loadStoku();
+  }
+
+  Future<void> loadStoku() async {
+    state = const AsyncValue.loading();
+    
+    try {
+      print('🌐 Loading Stoku data...');
+      final response = await _apiService.getStoku();
+      
+      if (response.success && response.data != null) {
+        final stokuList = response.data!.map((json) => Stoku.fromJson(json)).toList();
+        print('🌐 Loaded ${stokuList.length} Stoku records');
+        state = AsyncValue.data(stokuList);
+      } else {
+        print('🌐 Failed to load Stoku: ${response.error}');
+        state = AsyncValue.error(Exception(response.error ?? 'Failed to load Stoku'), StackTrace.current);
+      }
+    } catch (e, stackTrace) {
+      print('🌐 Error loading Stoku: $e');
+      state = AsyncValue.error(e, stackTrace);
+    }
+  }
+
+  Future<void> refresh() async {
+    await loadStoku();
+  }
+
+  Future<void> search(String query) async {
+    // For now, just reload the data
+    // TODO: Implement server-side search
+    await loadStoku();
+  }
+}
 
 final stokuProvider = FutureProvider.family<Stoku, int>((ref, id) async {
   final apiService = ref.read(apiServiceProvider);
@@ -180,14 +285,49 @@ final artikulliBazeProvider = FutureProvider.family<ArtikulliBaze, int>((ref, id
 });
 
 // Subjektet Providers
-final subjektetListProvider = StateNotifierProvider<EntityListNotifier<Subjekti>, AsyncValue<List<Subjekti>>>((ref) {
+final subjektetListProvider = StateNotifierProvider<SubjektetListNotifier, AsyncValue<List<Subjekti>>>((ref) {
   final apiService = ref.read(apiServiceProvider);
-  return EntityListNotifier<Subjekti>(
-    apiService,
-    'Subjektet',
-    (json) => Subjekti.fromJson(json),
-  );
+  return SubjektetListNotifier(apiService);
 });
+
+class SubjektetListNotifier extends StateNotifier<AsyncValue<List<Subjekti>>> {
+  final ApiService _apiService;
+  
+  SubjektetListNotifier(this._apiService) : super(const AsyncValue.loading()) {
+    loadSubjektet();
+  }
+
+  Future<void> loadSubjektet() async {
+    state = const AsyncValue.loading();
+    
+    try {
+      print('🌐 Loading Subjektet data...');
+      final response = await _apiService.getSubjektet();
+      
+      if (response.success && response.data != null) {
+        final subjektetList = response.data!.map((json) => Subjekti.fromJson(json)).toList();
+        print('🌐 Loaded ${subjektetList.length} Subjektet records');
+        state = AsyncValue.data(subjektetList);
+      } else {
+        print('🌐 Failed to load Subjektet: ${response.error}');
+        state = AsyncValue.error(Exception(response.error ?? 'Failed to load Subjektet'), StackTrace.current);
+      }
+    } catch (e, stackTrace) {
+      print('🌐 Error loading Subjektet: $e');
+      state = AsyncValue.error(e, stackTrace);
+    }
+  }
+
+  Future<void> refresh() async {
+    await loadSubjektet();
+  }
+
+  Future<void> search(String query) async {
+    // For now, just reload the data
+    // TODO: Implement server-side search
+    await loadSubjektet();
+  }
+}
 
 final subjektiProvider = FutureProvider.family<Subjekti, int>((ref, id) async {
   final apiService = ref.read(apiServiceProvider);
@@ -204,33 +344,157 @@ final subjektiProvider = FutureProvider.family<Subjekti, int>((ref, id) async {
   }
 });
 
+// Generic Data List Providers - for entities that use Map<String, dynamic>
+class GenericDataListNotifier extends StateNotifier<AsyncValue<List<Map<String, dynamic>>>> {
+  final ApiService _apiService;
+  final String _tableName;
+  final Future<ApiResponse<List<Map<String, dynamic>>>> Function() _apiCall;
+  
+  GenericDataListNotifier(this._apiService, this._tableName, this._apiCall) 
+      : super(const AsyncValue.loading()) {
+    loadData();
+  }
+
+  Future<void> loadData() async {
+    state = const AsyncValue.loading();
+    
+    try {
+      print('🌐 Loading data for table: $_tableName');
+      final response = await _apiCall();
+      
+      print('🌐 Generic data response success: ${response.success}');
+      print('🌐 Generic data response data type: ${response.data?.runtimeType}');
+      
+      if (response.success && response.data != null) {
+        print('🌐 Setting state with ${response.data!.length} generic records');
+        state = AsyncValue.data(response.data!);
+      } else {
+        print('🌐 Generic data provider error: ${response.error}');
+        state = AsyncValue.error(
+          Exception(response.error ?? 'Failed to load data'),
+          StackTrace.current,
+        );
+      }
+    } catch (error, stackTrace) {
+      print('🌐 Error loading generic data: $error');
+      state = AsyncValue.error(error, stackTrace);
+    }
+  }
+
+  Future<void> refresh() async {
+    await loadData();
+  }
+}
+
 // Kategoria Providers
-final kategoriaListProvider = StateNotifierProvider<EntityListNotifier<Kategoria>, AsyncValue<List<Kategoria>>>((ref) {
+final kategoriaListProvider = StateNotifierProvider<GenericDataListNotifier, AsyncValue<List<Map<String, dynamic>>>>((ref) {
   final apiService = ref.read(apiServiceProvider);
-  return EntityListNotifier<Kategoria>(
+  return GenericDataListNotifier(
     apiService,
     'Kategoria',
-    (json) => Kategoria.fromJson(json),
+    () => apiService.getKategoria(),
   );
 });
 
 // TVSH Providers
-final tvshListProvider = StateNotifierProvider<EntityListNotifier<TVSH>, AsyncValue<List<TVSH>>>((ref) {
+final tvshListProvider = StateNotifierProvider<GenericDataListNotifier, AsyncValue<List<Map<String, dynamic>>>>((ref) {
   final apiService = ref.read(apiServiceProvider);
-  return EntityListNotifier<TVSH>(
+  return GenericDataListNotifier(
     apiService,
     'TVSH',
-    (json) => TVSH.fromJson(json),
+    () => apiService.getTVSH(),
   );
 });
 
 // Shfrytezuesi Providers
-final shfrytezuesiListProvider = StateNotifierProvider<EntityListNotifier<Shfrytezuesi>, AsyncValue<List<Shfrytezuesi>>>((ref) {
+final shfrytezuesiListProvider = StateNotifierProvider<GenericDataListNotifier, AsyncValue<List<Map<String, dynamic>>>>((ref) {
   final apiService = ref.read(apiServiceProvider);
-  return EntityListNotifier<Shfrytezuesi>(
+  return GenericDataListNotifier(
     apiService,
     'Shfrytezuesi',
-    (json) => Shfrytezuesi.fromJson(json),
+    () => apiService.getShfrytezuesi(),
+  );
+});
+
+// Additional generic providers for other tables
+final faturaKategoriaListProvider = StateNotifierProvider<GenericDataListNotifier, AsyncValue<List<Map<String, dynamic>>>>((ref) {
+  final apiService = ref.read(apiServiceProvider);
+  return GenericDataListNotifier(
+    apiService,
+    'FaturaKategoria',
+    () => apiService.getFaturaKategoria(),
+  );
+});
+
+final blerjeKategoriaListProvider = StateNotifierProvider<GenericDataListNotifier, AsyncValue<List<Map<String, dynamic>>>>((ref) {
+  final apiService = ref.read(apiServiceProvider);
+  return GenericDataListNotifier(
+    apiService,
+    'BlerjeKategoria',
+    () => apiService.getBlerjeKategoria(),
+  );
+});
+
+final menyraPageseListProvider = StateNotifierProvider<GenericDataListNotifier, AsyncValue<List<Map<String, dynamic>>>>((ref) {
+  final apiService = ref.read(apiServiceProvider);
+  return GenericDataListNotifier(
+    apiService,
+    'MenyraPageses',
+    () => apiService.getMenyraPageses(),
+  );
+});
+
+final pagesatListProvider = StateNotifierProvider<GenericDataListNotifier, AsyncValue<List<Map<String, dynamic>>>>((ref) {
+  final apiService = ref.read(apiServiceProvider);
+  return GenericDataListNotifier(
+    apiService,
+    'Pagesat',
+    () => apiService.getPagesat(),
+  );
+});
+
+final porosiaListProvider = StateNotifierProvider<GenericDataListNotifier, AsyncValue<List<Map<String, dynamic>>>>((ref) {
+  final apiService = ref.read(apiServiceProvider);
+  return GenericDataListNotifier(
+    apiService,
+    'Porosia',
+    () => apiService.getPorosia(),
+  );
+});
+
+final porositeEBlerjesListProvider = StateNotifierProvider<GenericDataListNotifier, AsyncValue<List<Map<String, dynamic>>>>((ref) {
+  final apiService = ref.read(apiServiceProvider);
+  return GenericDataListNotifier(
+    apiService,
+    'PorositeEBlerjes',
+    () => apiService.getPorositeEBlerjes(),
+  );
+});
+
+final tavolinaListProvider = StateNotifierProvider<GenericDataListNotifier, AsyncValue<List<Map<String, dynamic>>>>((ref) {
+  final apiService = ref.read(apiServiceProvider);
+  return GenericDataListNotifier(
+    apiService,
+    'Tavolina',
+    () => apiService.getTavolina(),
+  );
+});
+
+final normativaListProvider = StateNotifierProvider<GenericDataListNotifier, AsyncValue<List<Map<String, dynamic>>>>((ref) {
+  final apiService = ref.read(apiServiceProvider);
+  return GenericDataListNotifier(
+    apiService,
+    'Normativa',
+    () => apiService.getNormativa(),
+  );
+});
+
+final zRaportetListProvider = StateNotifierProvider<GenericDataListNotifier, AsyncValue<List<Map<String, dynamic>>>>((ref) {
+  final apiService = ref.read(apiServiceProvider);
+  return GenericDataListNotifier(
+    apiService,
+    'ZRaportet',
+    () => apiService.getZRaportet(),
   );
 });
 
@@ -238,7 +502,7 @@ final shfrytezuesiListProvider = StateNotifierProvider<EntityListNotifier<Shfryt
 class EntityCrudNotifier<T> extends StateNotifier<AsyncValue<T?>> {
   final ApiService _apiService;
   final String _table;
-  final T Function(Map<String, dynamic>) _fromJson;
+  final T Function(dynamic) _fromJson;
   
   EntityCrudNotifier(this._apiService, this._table, this._fromJson) : super(const AsyncValue.data(null));
 

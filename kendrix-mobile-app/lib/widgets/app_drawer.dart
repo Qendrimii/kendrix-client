@@ -133,6 +133,14 @@ class AppDrawer extends ConsumerWidget {
                         context.go(AppRoute.blerjeKategoria.path);
                       },
                     ),
+                    ListTile(
+                      leading: const Icon(Icons.shopping_cart_checkout),
+                      title: Text('Purchase Orders'),
+                      onTap: () {
+                        Navigator.pop(context);
+                        context.go(AppRoute.porositeEBlerjes.path);
+                      },
+                    ),
                   ],
                 ),
                 
@@ -162,6 +170,83 @@ class AppDrawer extends ConsumerWidget {
                       onTap: () {
                         Navigator.pop(context);
                         context.go(AppRoute.kategoria.path);
+                      },
+                    ),
+                  ],
+                ),
+                
+                ExpansionTile(
+                  leading: const Icon(Icons.restaurant),
+                  title: Text('Orders & Tables'),
+                  children: [
+                    ListTile(
+                      leading: const Icon(Icons.receipt_long),
+                      title: Text('Orders'),
+                      onTap: () {
+                        Navigator.pop(context);
+                        context.go(AppRoute.porosia.path);
+                      },
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.table_restaurant),
+                      title: Text('Tables'),
+                      onTap: () {
+                        Navigator.pop(context);
+                        context.go(AppRoute.tavolina.path);
+                      },
+                    ),
+                  ],
+                ),
+                
+                ExpansionTile(
+                  leading: const Icon(Icons.people),
+                  title: Text('Users & Settings'),
+                  children: [
+                    ListTile(
+                      leading: const Icon(Icons.person),
+                      title: Text('Users'),
+                      onTap: () {
+                        Navigator.pop(context);
+                        context.go(AppRoute.shfrytezuesi.path);
+                      },
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.payment),
+                      title: Text('Payment Methods'),
+                      onTap: () {
+                        Navigator.pop(context);
+                        context.go(AppRoute.menyraPageses.path);
+                      },
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.percent),
+                      title: Text('Tax Rates'),
+                      onTap: () {
+                        Navigator.pop(context);
+                        context.go(AppRoute.tvsh.path);
+                      },
+                    ),
+                  ],
+                ),
+                
+                ExpansionTile(
+                  leading: const Icon(Icons.analytics),
+                  title: Text('Reports & Analytics'),
+                  children: [
+                    ListTile(
+                      leading: const Icon(Icons.assessment),
+                      title: Text('Z Reports'),
+                      onTap: () {
+                        Navigator.pop(context);
+                        context.go(AppRoute.zRaportet.path);
+                      },
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.rule),
+                      title: Text('Regulations'),
+                      onTap: () {
+                        Navigator.pop(context);
+                        context.go(AppRoute.normativa.path);
                       },
                     ),
                   ],

@@ -7,6 +7,8 @@ class TokenStorage {
   static const _accessTokenKey = 'access_token';
   static const _refreshTokenKey = 'refresh_token';
   static const _selectedTenantIdKey = 'selected_tenant_id';
+  static const _tenantKeyKey = 'tenant_key';
+  static const _rememberedTenantKeyKey = 'remembered_tenant_key';
 
   static const _storage = FlutterSecureStorage(
     aOptions: AndroidOptions(
@@ -118,6 +120,61 @@ class TokenStorage {
       await prefs.clear();
     } else {
       await _storage.deleteAll();
+    }
+  }
+
+  Future<String?> getTenantKey() async {
+    if (kIsWeb) {
+      final prefs = await SharedPreferences.getInstance();
+      return prefs.getString(_tenantKeyKey);
+    } else {
+      return await _storage.read(key: _tenantKeyKey);
+    }
+  }
+
+  Future<void> setTenantKey(String tenantKey) async {
+    if (kIsWeb) {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_tenantKeyKey, tenantKey);
+    } else {
+      await _storage.write(key: _tenantKeyKey, value: tenantKey);
+    }
+  }
+
+  Future<void> clearTenantKey() async {
+    if (kIsWeb) {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove(_tenantKeyKey);
+    } else {
+      await _storage.delete(key: _tenantKeyKey);
+    }
+  }
+
+  // Methods for remembering tenant key for login form convenience
+  Future<String?> getRememberedTenantKey() async {
+    if (kIsWeb) {
+      final prefs = await SharedPreferences.getInstance();
+      return prefs.getString(_rememberedTenantKeyKey);
+    } else {
+      return await _storage.read(key: _rememberedTenantKeyKey);
+    }
+  }
+
+  Future<void> setRememberedTenantKey(String tenantKey) async {
+    if (kIsWeb) {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_rememberedTenantKeyKey, tenantKey);
+    } else {
+      await _storage.write(key: _rememberedTenantKeyKey, value: tenantKey);
+    }
+  }
+
+  Future<void> clearRememberedTenantKey() async {
+    if (kIsWeb) {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove(_rememberedTenantKeyKey);
+    } else {
+      await _storage.delete(key: _rememberedTenantKeyKey);
     }
   }
 }

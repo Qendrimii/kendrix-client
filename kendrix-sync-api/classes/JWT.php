@@ -66,12 +66,12 @@ class JWT
         }
 
         // Check subject
-        if (!isset($payload['sub']) || $payload['sub'] !== 'agent') {
+        if (!isset($payload['sub']) || !in_array($payload['sub'], ['agent', 'user'])) {
             return false;
         }
 
-        // Check scope if present
-        if (isset($payload['scope']) && strpos($payload['scope'], 'sync') === false) {
+        // Check scope if present (only for agent tokens)
+        if ($payload['sub'] === 'agent' && isset($payload['scope']) && strpos($payload['scope'], 'sync') === false) {
             return false;
         }
 
