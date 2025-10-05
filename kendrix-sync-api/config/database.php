@@ -68,5 +68,10 @@ class Database
     {
         return $this->pdo->inTransaction();
     }
+
+    public function getPdo()
+    {
+        return $this->pdo;
+    }
 }
 

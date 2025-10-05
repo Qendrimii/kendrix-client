@@ -41,7 +41,7 @@ class Router
     
     public function __construct()
     {
-        $this->pdo = Database::getInstance();
+        $this->pdo = Database::getInstance()->getPdo();
     }
     
     private $routes = [
@@ -353,32 +353,35 @@ class Router
 
         $email = $input['email'] ?? '';
         $password = $input['password'] ?? '';
-        $tenantKey = $input['tenant_key'] ?? '';
+        $tenantKey = $input['tenant_key'] ?? null;
 
-        error_log("Login attempt: email=$email, tenant_key=$tenantKey");
+        error_log("Login attempt: email=$email, tenant_key=" . ($tenantKey ?? 'auto'));
 
-        if (empty($email) || empty($password) || empty($tenantKey)) {
+        if (empty($email) || empty($password)) {
             error_log("Missing required fields");
             $response = new Response();
-            $response->error('Missing required fields', 400, 'Email, password, and tenant_key are required');
+            $response->error('Missing required fields', 400, 'Email and password are required');
             return;
         }
 
         try {
-            // Validate tenant
-            error_log("Validating tenant with key: $tenantKey");
-            $tenant = $this->validateTenantByKey($tenantKey);
-            if (!$tenant) {
-                error_log("Tenant validation failed");
-                $response = new Response();
-                $response->error('Invalid tenant', 401, 'Invalid tenant key');
-                return;
+            // If tenant key is provided, validate it
+            $tenant = null;
+            if ($tenantKey) {
+                error_log("Validating provided tenant key: $tenantKey");
+                $tenant = $this->validateTenantByKey($tenantKey);
+                if (!$tenant) {
+                    error_log("Tenant validation failed");
+                    $response = new Response();
+                    $response->error('Invalid tenant', 401, 'Invalid tenant key');
+                    return;
+                }
+                error_log("Tenant validated: " . json_encode($tenant));
             }
-            error_log("Tenant validated: " . json_encode($tenant));
 
             // Check user credentials
             error_log("Looking up user: $email");
-            $stmt = $this->pdo->query("SELECT * FROM users WHERE Email = ?", [$email]);
+            $stmt = $this->pdo->query("SELECT u.*, ut.TenantId FROM users u LEFT JOIN user_tenants ut ON u.Id = ut.UserId WHERE u.Email = ?", [$email]);
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if (!$user) {
@@ -397,8 +400,40 @@ class Router
                 return;
             }
 
+            // Get user's tenant(s) if not already set
+            if (!$tenant) {
+                $userTenantId = $user['TenantId'] ?? null;
+                
+                if ($userTenantId) {
+                    error_log("Getting user's tenant from user_tenants: $userTenantId");
+                    $tenantStmt = $this->pdo->query("SELECT * FROM tenants WHERE Id = ? AND Status = 'active'", [$userTenantId]);
+                    $tenant = $tenantStmt->fetch(PDO::FETCH_ASSOC);
+                    
+                    if (!$tenant) {
+                        error_log("User's tenant not found or inactive");
+                        $response = new Response();
+                        $response->error('Tenant not found', 404, 'User tenant not found or inactive');
+                        return;
+                    }
+                } else {
+                    // If user doesn't have a tenant association, get the first active tenant (fallback)
+                    error_log("User has no tenant association, getting first active tenant");
+                    $tenantStmt = $this->pdo->query("SELECT * FROM tenants WHERE Status = 'active' LIMIT 1");
+                    $tenant = $tenantStmt->fetch(PDO::FETCH_ASSOC);
+                    
+                    if (!$tenant) {
+                        error_log("No active tenants found");
+                        $response = new Response();
+                        $response->error('No tenant available', 404, 'No active tenant found');
+                        return;
+                    }
+                }
+                
+                error_log("Using tenant: " . json_encode($tenant));
+            }
+
             // Generate JWT token
-            error_log("Generating JWT token");
+            error_log("Generating JWT token for tenant: " . $tenant['Id']);
             $jwt = new JWT();
             $token = $jwt->encode([
                 'sub' => 'user',
@@ -420,7 +455,8 @@ class Router
                 ],
                 'tenant' => [
                     'id' => $tenant['Id'],
-                    'name' => $tenant['Name']
+                    'name' => $tenant['Name'],
+                    'external_key' => $tenant['ExternalKey']
                 ]
             ];
             
@@ -505,11 +541,31 @@ class Router
         if (!$tenant) return;
 
         try {
-            $stmt = $this->pdo->query("SELECT * FROM Fatura WHERE tenant_id = ? ORDER BY Id", [$tenant['Id']]);
+            // Get date range parameters
+            $fromDate = isset($_GET['from_date']) ? $_GET['from_date'] : null;
+            $toDate = isset($_GET['to_date']) ? $_GET['to_date'] : null;
+            
+            // If no dates provided, default to today
+            if (!$fromDate && !$toDate) {
+                $today = date('Y-m-d');
+                $fromDate = $today;
+                $toDate = $today;
+            }
+            
+            // Use stored procedure to get fatura list with date filtering
+            $stmt = $this->pdo->prepare("CALL sp_get_fatura_list(?, ?, ?)");
+            $stmt->execute([$tenant['Id'], $fromDate, $toDate]);
             $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             $response = new Response();
-            $response->success($data);
+            $response->success([
+                'data' => $data,
+                'meta' => [
+                    'fromDate' => $fromDate,
+                    'toDate' => $toDate,
+                    'count' => count($data)
+                ]
+            ]);
         } catch (Exception $e) {
             error_log("Fatura fetch error: " . $e->getMessage());
             $response = new Response();
@@ -526,11 +582,31 @@ class Router
         if (!$tenant) return;
 
         try {
-            $stmt = $this->pdo->query("SELECT * FROM Blerjet WHERE tenant_id = ? ORDER BY Id", [$tenant['Id']]);
+            // Get date range parameters
+            $fromDate = isset($_GET['from_date']) ? $_GET['from_date'] : null;
+            $toDate = isset($_GET['to_date']) ? $_GET['to_date'] : null;
+            
+            // If no dates provided, default to today
+            if (!$fromDate && !$toDate) {
+                $today = date('Y-m-d');
+                $fromDate = $today;
+                $toDate = $today;
+            }
+            
+            // Use stored procedure to get blerjet list with date filtering
+            $stmt = $this->pdo->prepare("CALL sp_get_blerjet_list(?, ?, ?)");
+            $stmt->execute([$tenant['Id'], $fromDate, $toDate]);
             $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             $response = new Response();
-            $response->success($data);
+            $response->success([
+                'data' => $data,
+                'meta' => [
+                    'fromDate' => $fromDate,
+                    'toDate' => $toDate,
+                    'count' => count($data)
+                ]
+            ]);
         } catch (Exception $e) {
             error_log("Blerjet fetch error: " . $e->getMessage());
             $response = new Response();
@@ -596,194 +672,121 @@ class Router
                 throw new Exception("Database connection test failed");
             }
             
-            // Get today's date for filtering
-            $today = date('Y-m-d');
-            $thisMonth = date('Y-m');
+            // Get date range parameters
+            $fromDate = isset($_GET['from_date']) ? $_GET['from_date'] : null;
+            $toDate = isset($_GET['to_date']) ? $_GET['to_date'] : null;
             
-            // Today's stats
-            $todayStats = [
-                'SalesNet' => 0.0,
-                'SalesVat' => 0.0,
-                'InvoiceCount' => 0,
-                'PurchaseCount' => 0,
-            ];
+            // If no dates provided, default to today
+            if (!$fromDate && !$toDate) {
+                $today = date('Y-m-d');
+                $fromDate = $today;
+                $toDate = $today;
+            }
             
-            // Monthly stats
-            $monthlyStats = [
-                'monthlyRevenue' => 0.0,
-                'avgTicket' => 0.0,
-                'totalInvoices' => 0,
-                'totalPurchases' => 0,
-            ];
-            
-            // Get today's sales from Fatura
+            // Get user sales data using stored procedure
+            $userSales = [];
             try {
-                // First try with today's date filter
-                $stmt = $this->pdo->query("
-                    SELECT 
-                        COUNT(*) as invoice_count,
-                        COALESCE(SUM(Totali), 0) as total_sales,
-                        COALESCE(SUM(Totali * 0.2), 0) as total_vat
-                    FROM Fatura 
-                    WHERE tenant_id = ? AND DATE(Data) = ?
-                ", [$tenant['Id'], $today]);
-                $result = $stmt->fetch(PDO::FETCH_ASSOC);
+                $stmt = $this->pdo->prepare("CALL sp_get_user_sales_simple(?, ?, ?)");
+                $stmt->execute([$tenant['Id'], $fromDate, $toDate]);
+                $rawUserSales = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 
-                // If no data for today, get all data for this tenant
-                if ($result['invoice_count'] == 0) {
-                    $stmt = $this->pdo->query("
-                        SELECT 
-                            COUNT(*) as invoice_count,
-                            COALESCE(SUM(Totali), 0) as total_sales,
-                            COALESCE(SUM(Totali * 0.2), 0) as total_vat
-                        FROM Fatura 
-                        WHERE tenant_id = ?
-                    ", [$tenant['Id']]);
-                    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+                // Convert string values to proper types
+                foreach ($rawUserSales as $sale) {
+                    $userSales[] = [
+                        'Id' => (int)$sale['Id'],
+                        'Username' => $sale['Username'],
+                        'Shuma' => (float)$sale['Shuma'],
+                        'Data' => $sale['Data']
+                    ];
                 }
-                
-                $todayStats['InvoiceCount'] = (int)$result['invoice_count'];
-                $todayStats['SalesNet'] = (float)$result['total_sales'];
-                $todayStats['SalesVat'] = (float)$result['total_vat'];
-                
-                error_log("Today's sales query result: " . json_encode($result));
+                error_log("User sales query result: " . json_encode($userSales));
             } catch (Exception $e) {
-                error_log("Today's sales query failed: " . $e->getMessage());
-                // Set default values if query fails
-                $todayStats['InvoiceCount'] = 0;
-                $todayStats['SalesNet'] = 0.0;
-                $todayStats['SalesVat'] = 0.0;
+                error_log("User sales query failed: " . $e->getMessage());
+                $userSales = [];
             }
             
-            // Get today's purchases from Blerjet
+            // Get today's sales by category using stored procedure
+            $salesByCategory = [];
             try {
-                // First try with today's date filter
-                $stmt = $this->pdo->query("
-                    SELECT COUNT(*) as purchase_count
-                    FROM Blerjet 
-                    WHERE tenant_id = ? AND DATE(DataEFatures) = ?
-                ", [$tenant['Id'], $today]);
-                $result = $stmt->fetch(PDO::FETCH_ASSOC);
+                $stmt = $this->pdo->prepare("CALL sp_get_todays_sales_by_category(?)");
+                $stmt->execute([$tenant['Id']]);
+                $salesByCategory = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                error_log("Sales by category query result: " . json_encode($salesByCategory));
+            } catch (Exception $e) {
+                error_log("Sales by category query failed: " . $e->getMessage());
+                $salesByCategory = [];
+            }
+            
+            // Get today's deletions by user using stored procedure
+            $deletionsByUser = [];
+            try {
+                $stmt = $this->pdo->prepare("CALL sp_get_todays_deletions_by_user(?)");
+                $stmt->execute([$tenant['Id']]);
+                $deletionsByUser = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                error_log("Deletions by user query result: " . json_encode($deletionsByUser));
+            } catch (Exception $e) {
+                error_log("Deletions by user query failed: " . $e->getMessage());
+                $deletionsByUser = [];
+            }
+            
+            // Get running sales total
+            $runningSalesTotal = [];
+            try {
+                $stmt = $this->pdo->prepare("CALL sp_get_running_sales_total(?)");
+                $stmt->execute([$tenant['Id']]);
+                $rawRunningSales = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 
-                // If no data for today, get all data for this tenant
-                if ($result['purchase_count'] == 0) {
-                    $stmt = $this->pdo->query("
-                        SELECT COUNT(*) as purchase_count
-                        FROM Blerjet 
-                        WHERE tenant_id = ?
-                    ", [$tenant['Id']]);
-                    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+                // Convert string values to proper types
+                foreach ($rawRunningSales as $sale) {
+                    $runningSalesTotal[] = [
+                        'SaleNumber' => (int)$sale['SaleNumber'],
+                        'Id' => (int)$sale['Id'],
+                        'Shuma' => (float)$sale['Shuma'],
+                        'RunningTotal' => (float)$sale['RunningTotal']
+                    ];
                 }
-                
-                $todayStats['PurchaseCount'] = (int)$result['purchase_count'];
-                error_log("Today's purchases query result: " . json_encode($result));
+                error_log("Running sales total query result: " . json_encode($runningSalesTotal));
             } catch (Exception $e) {
-                error_log("Today's purchases query failed: " . $e->getMessage());
-                $todayStats['PurchaseCount'] = 0;
+                error_log("Running sales total query failed: " . $e->getMessage());
+                $runningSalesTotal = [];
             }
             
-            // Get monthly stats
-            try {
-                // First try with this month's filter
-                $stmt = $this->pdo->query("
-                    SELECT 
-                        COUNT(*) as total_invoices,
-                        COALESCE(SUM(Totali), 0) as monthly_revenue,
-                        COALESCE(AVG(Totali), 0) as avg_ticket
-                    FROM Fatura 
-                    WHERE tenant_id = ? AND DATE_FORMAT(Data, '%Y-%m') = ?
-                ", [$tenant['Id'], $thisMonth]);
-                $result = $stmt->fetch(PDO::FETCH_ASSOC);
-                
-                // If no data for this month, get all data for this tenant
-                if ($result['total_invoices'] == 0) {
-                    $stmt = $this->pdo->query("
-                        SELECT 
-                            COUNT(*) as total_invoices,
-                            COALESCE(SUM(Totali), 0) as monthly_revenue,
-                            COALESCE(AVG(Totali), 0) as avg_ticket
-                        FROM Fatura 
-                        WHERE tenant_id = ?
-                    ", [$tenant['Id']]);
-                    $result = $stmt->fetch(PDO::FETCH_ASSOC);
-                }
-                
-                $monthlyStats['totalInvoices'] = (int)$result['total_invoices'];
-                $monthlyStats['monthlyRevenue'] = (float)$result['monthly_revenue'];
-                $monthlyStats['avgTicket'] = (float)$result['avg_ticket'];
-                error_log("Monthly stats query result: " . json_encode($result));
-            } catch (Exception $e) {
-                error_log("Monthly stats query failed: " . $e->getMessage());
-                $monthlyStats['totalInvoices'] = 0;
-                $monthlyStats['monthlyRevenue'] = 0.0;
-                $monthlyStats['avgTicket'] = 0.0;
+            // Calculate totals from user sales data
+            $totalSales = 0.0;
+            $totalUsers = count($userSales);
+            foreach ($userSales as $userSale) {
+                $totalSales += (float)$userSale['Shuma'];
             }
             
-            // Get monthly purchases
-            try {
-                // First try with this month's filter
-                $stmt = $this->pdo->query("
-                    SELECT COUNT(*) as total_purchases
-                    FROM Blerjet 
-                    WHERE tenant_id = ? AND DATE_FORMAT(DataEFatures, '%Y-%m') = ?
-                ", [$tenant['Id'], $thisMonth]);
-                $result = $stmt->fetch(PDO::FETCH_ASSOC);
-                
-                // If no data for this month, get all data for this tenant
-                if ($result['total_purchases'] == 0) {
-                    $stmt = $this->pdo->query("
-                        SELECT COUNT(*) as total_purchases
-                        FROM Blerjet 
-                        WHERE tenant_id = ?
-                    ", [$tenant['Id']]);
-                    $result = $stmt->fetch(PDO::FETCH_ASSOC);
-                }
-                
-                $monthlyStats['totalPurchases'] = (int)$result['total_purchases'];
-                error_log("Monthly purchases query result: " . json_encode($result));
-            } catch (Exception $e) {
-                error_log("Monthly purchases query failed: " . $e->getMessage());
-                $monthlyStats['totalPurchases'] = 0;
+            // Calculate category totals
+            $categoryTotals = [];
+            foreach ($salesByCategory as $category) {
+                $categoryTotals[] = [
+                    'category' => $category['Kategoria'],
+                    'totalSales' => (float)$category['TotalSales']
+                ];
             }
             
-            // Get recent invoices (last 5)
-            try {
-                $stmt = $this->pdo->query("
-                    SELECT Id, NrFatures, Totali, Data, SubjektiId
-                    FROM Fatura 
-                    WHERE tenant_id = ? 
-                    ORDER BY Data DESC 
-                    LIMIT 5
-                ", [$tenant['Id']]);
-                $recentInvoices = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                error_log("Recent invoices query result: " . json_encode($recentInvoices));
-            } catch (Exception $e) {
-                error_log("Recent invoices query failed: " . $e->getMessage());
-                $recentInvoices = [];
-            }
-            
-            // Get low stock items (quantity < 10)
-            try {
-                $stmt = $this->pdo->query("
-                    SELECT s.Id, s.Sasia, ab.Emri as ProductName
-                    FROM Stoku s
-                    JOIN ArtikulliBaze ab ON s.ProduktiId = ab.Id
-                    WHERE s.tenant_id = ? AND s.Sasia < 10
-                    ORDER BY s.Sasia ASC
-                    LIMIT 10
-                ", [$tenant['Id']]);
-                $lowStock = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                error_log("Low stock query result: " . json_encode($lowStock));
-            } catch (Exception $e) {
-                error_log("Low stock query failed: " . $e->getMessage());
-                $lowStock = [];
+            // Format deletions by user
+            $deletionTotals = [];
+            foreach ($deletionsByUser as $deletion) {
+                $deletionTotals[] = [
+                    'username' => $deletion['Shfrytezuesi'],
+                    'totalDeleted' => (float)$deletion['TotalDeleted']
+                ];
             }
             
             $stats = [
-                'today' => $todayStats,
-                'monthly' => $monthlyStats,
-                'recentInvoices' => $recentInvoices,
-                'lowStock' => $lowStock,
+                'userSales' => $userSales,
+                'salesByCategory' => $categoryTotals,
+                'deletionsByUser' => $deletionTotals,
+                'runningSalesTotal' => $runningSalesTotal,
+                'totals' => [
+                    'totalSales' => $totalSales,
+                    'totalUsers' => $totalUsers,
+                    'fromDate' => $fromDate,
+                    'toDate' => $toDate
+                ]
             ];
 
             error_log("Dashboard stats generated: " . json_encode($stats));
